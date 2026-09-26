@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="uk">
+<html lang="uk" class="is-loading">
   <head>
     <meta charset="UTF-8" />
     <meta name="color-scheme" content="light" />
@@ -9,8 +9,33 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Onest:wght@400;500;600&display=swap" rel="stylesheet" />
+    <style>
+      /* Прелоадер: лише CSS, показується одразу, ще до завантаження скриптів */
+      #preloader { position: fixed; inset: 0; z-index: 1000; background: #fff; display: grid; place-content: center; justify-items: center; gap: 22px; color: #312a22;
+        transition: opacity .6s ease, visibility 0s .6s !important; }
+      #preloader.is-done { opacity: 0; visibility: hidden; pointer-events: none; }
+      #preloader .pl-star { width: 64px; height: 64px; animation: pl-spin 2.4s cubic-bezier(.6,0,.4,1) infinite !important; }
+      #preloader .pl-name { font: 700 22px/1 'Oswald', 'Arial Narrow', sans-serif; text-transform: uppercase; letter-spacing: .12em; }
+      #preloader .pl-bar { width: 160px; height: 2px; background: #e4ded9; overflow: hidden; position: relative; }
+      #preloader .pl-bar::after { content: ''; position: absolute; inset: 0; background: #312a22; transform: translateX(-100%); animation: pl-bar 1.3s ease-in-out infinite !important; }
+      @keyframes pl-spin { 0% { transform: rotate(0) scale(.9); } 50% { transform: rotate(180deg) scale(1.05); } 100% { transform: rotate(360deg) scale(.9); } }
+      @keyframes pl-bar { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+      @media (prefers-reduced-motion: reduce) { #preloader .pl-star, #preloader .pl-bar::after { animation: none !important; } }
+    </style>
   </head>
   <body>
+    <div id="preloader" role="status" aria-label="Завантаження сайту">
+      <svg class="pl-star" viewBox="0 0 100 100" aria-hidden="true">
+        <path d="M50 2 56 44 50 50z" fill="#c7bdb3"/><path d="M50 2 44 44 50 50z" fill="#312a22"/>
+        <path d="M98 50 56 56 50 50z" fill="#6b655f"/><path d="M98 50 56 44 50 50z" fill="#c7bdb3"/>
+        <path d="M50 98 44 56 50 50z" fill="#6b655f"/><path d="M50 98 56 56 50 50z" fill="#312a22"/>
+        <path d="M2 50 44 44 50 50z" fill="#e4ded9"/><path d="M2 50 44 56 50 50z" fill="#6b655f"/>
+        <path d="M78 22 56 44 50 50 54 40z" fill="#c7bdb3" opacity=".8"/><path d="M22 78 44 56 50 50 46 60z" fill="#6b655f" opacity=".8"/>
+        <path d="M22 22 44 44 50 50 40 46z" fill="#e4ded9" opacity=".8"/><path d="M78 78 56 56 50 50 60 54z" fill="#312a22" opacity=".8"/>
+      </svg>
+      <span class="pl-name">Світанкова Зоря</span>
+      <span class="pl-bar"></span>
+    </div>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

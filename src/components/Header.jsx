@@ -18,6 +18,7 @@ export default function Header({ live }) {
 
   useEffect(() => {
     document.documentElement.classList.toggle('no-scroll', open);
+    if (open) window.lenis?.stop(); else window.lenis?.start();
     if (open) closeRef.current?.focus();
     const onKey = (e) => e.key === 'Escape' && setOpen(false);
     window.addEventListener('keydown', onKey);
@@ -58,7 +59,7 @@ export default function Header({ live }) {
       </header>
 
       <div className={`menu-dim ${open ? 'is-open' : ''}`} onClick={close} aria-hidden="true" />
-      <aside id="menu" className={`menu ${open ? 'is-open' : ''}`} aria-label="Меню сайту" aria-hidden={!open} inert={open ? undefined : ''}>
+      <aside id="menu" data-lenis-prevent className={`menu ${open ? 'is-open' : ''}`} aria-label="Меню сайту" aria-hidden={!open} inert={open ? undefined : ''}>
         <div className="menu__top">
           <span className="logo logo--light"><StarMark size={34} dark /><span className="logo__name">{church.name}</span></span>
           <button ref={closeRef} className="menu__close" onClick={close}>✕ Закрити</button>

@@ -42,6 +42,19 @@ ol, ul { list-style: none; padding: 0; }
 .muted { color: var(--muted); }
 .lead { font-size: 19px; line-height: 1.65; color: var(--muted); max-width: 34em; }
 
+/* Lenis (плавна прокрутка на комп'ютері) */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: hidden; }
+
+/* Поки йде прелоадер — анімації першого екрана чекають */
+html.is-loading .split__ch, html.is-loading .star3d, html.is-loading .hero__card { animation-play-state: paused !important; }
+html.is-loading .photo--reveal .photo__inner { clip-path: inset(0 0 100% 0) !important; }
+
+/* Короткий/довгий підпис над назвою */
+.only-mobile { display: none; }
+
 /* ── Типографіка ─────────────────────────────────────────── */
 .eyebrow { display: inline-flex; align-items: center; gap: 10px; font-weight: 500; font-size: 15px; letter-spacing: .02em; text-transform: uppercase; }
 .eyebrow__mark { width: 10px; height: 10px; background: var(--dark); flex: none; }
@@ -116,7 +129,7 @@ ol, ul { list-style: none; padding: 0; }
 .menu__list li { border-bottom: 1px solid var(--dline); opacity: 0; transform: translateX(-24px); transition: opacity .4s, transform .5s var(--ease); }
 .menu.is-open .menu__list li { opacity: 1; transform: none; transition-delay: calc(var(--i) * 35ms + 180ms); }
 .menu__list a { display: flex; align-items: baseline; gap: 16px; padding: 7px 0; color: var(--beige); transition: color .2s, padding .3s var(--ease); }
-.menu__list a:hover, .menu__list a:focus-visible { color: var(--white); padding-left: 8px; }
+.menu__list a:focus-visible { color: var(--white); padding-left: 8px; }
 .menu__list small { font-size: 12px; font-weight: 500; }
 .menu__list a.is-current { color: var(--white); }
 .menu__list a.is-current::after { content: ''; width: 9px; height: 9px; background: var(--white); margin-left: auto; align-self: center; }
@@ -126,7 +139,6 @@ ol, ul { list-style: none; padding: 0; }
 .menu__info dd { font-size: 15px; font-weight: 500; }
 .menu__btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .menu__socials { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-top: 18px; font-size: 13px; color: var(--beige); }
-.menu__socials a:hover { color: var(--white); }
 
 /* ── Hero ────────────────────────────────────────────────── */
 .hero { padding-top: 40px; padding-bottom: 50px; }
@@ -158,7 +170,6 @@ ol, ul { list-style: none; padding: 0; }
 .marquee { overflow: hidden; padding: 14px 0; border-bottom: 1px solid var(--light); }
 .marquee__track { display: flex; align-items: center; gap: 28px; width: max-content; animation: marquee 40s linear infinite; }
 .marquee__track span { font: 700 clamp(28px, 4vw, 55px)/1 var(--display); text-transform: uppercase; white-space: nowrap; }
-.marquee:hover .marquee__track { animation-play-state: paused; }
 @keyframes marquee { to { transform: translateX(-33.333%); } }
 
 /* ── Секції ──────────────────────────────────────────────── */
@@ -185,12 +196,10 @@ ol, ul { list-style: none; padding: 0; }
 .stream__player { position: relative; display: block; aspect-ratio: 16 / 9; overflow: hidden; }
 .stream__cover { position: absolute; inset: 0; transition: transform .8s var(--ease); }
 .stream__cover .photo__ph { background: radial-gradient(circle at 30% 30%, #5d5248, #2b241d 70%); color: var(--beige); }
-.stream__player:hover .stream__cover { transform: scale(1.03); }
 .badge { position: absolute; top: 28px; left: 28px; background: var(--dark); padding: 8px 14px; font-size: 13px; font-weight: 600; }
 .badge--live { background: var(--red); }
 .play { position: absolute; top: 50%; left: 50%; width: 90px; height: 90px; margin: -45px 0 0 -45px; border-radius: 50%; background: var(--white); transition: transform .35s var(--ease); }
 .play::after { content: ''; position: absolute; left: 36px; top: 30px; border-left: 26px solid var(--dark); border-block: 15px solid transparent; }
-.stream__player:hover .play { transform: scale(1.1); }
 .stream__caption { position: absolute; left: 28px; bottom: 28px; display: grid; gap: 4px; }
 .stream__caption strong { font: 700 34px/1 var(--display); text-transform: uppercase; }
 .stream__caption small { color: var(--beige); font-size: 15px; }
@@ -203,15 +212,11 @@ ol, ul { list-style: none; padding: 0; }
 .playlist a span { display: grid; gap: 4px; }
 .playlist small { color: var(--beige); font-size: 14px; }
 .playlist strong { font-weight: 500; font-size: 19px; line-height: 1.3; transition: color .2s; }
-.playlist a:hover strong { color: var(--beige); }
 
 /* ── Розклад ─────────────────────────────────────────────── */
 .schedule { border-top: 1px solid var(--line); position: relative; z-index: 0; }
 .schedule__row { display: grid; grid-template-columns: 170px 210px 1fr auto; align-items: center; gap: 40px; padding: 30px 20px 30px 0; border-bottom: 1px solid var(--line); position: relative; transition: color .35s, padding .35s var(--ease); }
 .schedule__row::before { content: ''; position: absolute; inset: 0 -20px; background: var(--dark); transform: scaleY(0); transform-origin: bottom; transition: transform .45s var(--ease); z-index: -1; }
-.schedule__row:hover { color: var(--white); padding-left: 20px; }
-.schedule__row:hover::before { transform: scaleY(1); }
-.schedule__row:hover .schedule__body span, .schedule__row:hover .schedule__place { color: var(--beige); }
 .schedule__day { font: 700 26px/1 var(--display); text-transform: uppercase; color: var(--beige); }
 .schedule__time { font: 700 64px/1 var(--display); font-variant-numeric: tabular-nums; }
 .schedule__body { display: grid; gap: 6px; }
@@ -263,12 +268,10 @@ ol, ul { list-style: none; padding: 0; }
 .event__date span { font-size: 15px; font-weight: 500; text-transform: uppercase; color: var(--muted); }
 .event__img { aspect-ratio: 280 / 180; }
 .event__img img { transition: transform .8s var(--ease); }
-.event:hover .event__img img { transform: scale(1.06); }
 .event__body { display: grid; gap: 12px; justify-items: start; }
 .event__body h3 { font: 700 40px/1.05 var(--display); text-transform: uppercase; }
 .tag { border: 1px solid var(--line); padding: 5px 12px; font-size: 13px; font-weight: 500; text-transform: uppercase; color: var(--muted); }
 .round-arrow { width: 64px; height: 64px; border-radius: 50%; background: var(--dark); color: var(--white); display: grid; place-items: center; font-size: 22px; transition: transform .35s var(--ease); }
-.event:hover .round-arrow { transform: rotate(-45deg); }
 
 /* ── Свята ───────────────────────────────────────────────── */
 .holidays__next { display: grid; gap: 2px; text-align: right; }
@@ -347,8 +350,6 @@ ol, ul { list-style: none; padding: 0; }
 .pray-ways > p { font-weight: 500; margin-bottom: 12px; }
 .pray-ways ul { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
 .pray-ways li > * { display: grid; gap: 2px; padding: 18px 20px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); height: 100%; transition: background .25s, color .25s; }
-.pray-ways a:hover { background: var(--dark); color: var(--white); }
-.pray-ways a:hover span { color: var(--beige); }
 .pray-ways strong { font: 700 22px/1.1 var(--display); text-transform: uppercase; }
 .pray-ways span { font-size: 14px; color: var(--muted); transition: color .25s; }
 
@@ -356,17 +357,13 @@ ol, ul { list-style: none; padding: 0; }
 .socials { display: grid; grid-template-columns: repeat(3, 1fr); border-block: 1px solid var(--light); margin-inline: -24px; }
 .socials li + li { border-left: 1px solid var(--light); }
 .socials a { display: grid; gap: 10px; padding: 34px 24px; justify-items: start; transition: background .3s; height: 100%; }
-.socials a:hover { background: var(--light); }
 .socials__ic { width: 56px; height: 56px; border-radius: 50%; background: var(--light); display: grid; place-items: center; font-weight: 600; font-size: 15px; margin-bottom: 4px; transition: background .3s, color .3s; }
-.socials a:hover .socials__ic { background: var(--dark); color: var(--white); }
 .socials strong { font: 700 34px/1 var(--display); text-transform: uppercase; }
 .socials__handle { font-weight: 500; font-size: 15px; }
 .socials__cta { font-size: 14px; font-weight: 500; text-transform: uppercase; color: var(--muted); margin-top: 6px; }
 .insta { display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; margin-top: 50px; }
 .insta__item { aspect-ratio: 1; }
-.insta a:hover img { transform: scale(1.06); }
 .stream__cover img { filter: saturate(.9) brightness(.8); }
-.hero__photo:hover img, .school__big:hover img { transform: scale(1.03); }
 
 /* ── Футер ───────────────────────────────────────────────── */
 .footer { border-top: 1px solid var(--light); padding: 80px 0 30px; }
@@ -380,7 +377,6 @@ ol, ul { list-style: none; padding: 0; }
 .footer__ok { font-weight: 500; }
 .footer h4 { font-weight: 500; font-size: 18px; margin-bottom: 14px; }
 .footer ul { display: grid; gap: 10px; font-size: 15px; color: var(--muted); }
-.footer ul a:hover { color: var(--dark); }
 .footer__giant { font: 700 min(171px, calc((min(100vw, var(--maxw)) - 2 * var(--pad)) / 7.84))/1 var(--display); text-transform: uppercase; color: var(--beige); white-space: nowrap; margin: 50px 0 20px; }
 .footer__bottom { display: flex; justify-content: space-between; gap: 20px; padding-top: 20px; border-top: 1px solid var(--light); font-size: 14px; color: var(--muted); flex-wrap: wrap; }
 
@@ -411,6 +407,8 @@ ol, ul { list-style: none; padding: 0; }
   .header__live { display: none; }
   .hero { padding-top: 24px; }
   .hero__meta { flex-direction: column; align-items: flex-start; gap: 6px; }
+  .only-mobile { display: inline; }
+  .only-desktop { display: none; }
   .hero__title { white-space: normal; font-size: 16vw; line-height: .92; margin: 20px 0 28px; }
   .hero__side { flex-direction: column; align-items: flex-start; }
   .hero__star { width: 160px; }
@@ -474,6 +472,28 @@ ol, ul { list-style: none; padding: 0; }
   .menu { padding-inline: 24px; }
 }
 
+/* ── Ефекти наведення — лише там, де є миша (на телефонах їх немає, крім кнопок) ── */
+@media (hover: hover) and (pointer: fine) {
+  .menu__list a:hover { color: var(--white); padding-left: 8px; }
+  .menu__socials a:hover { color: var(--white); }
+  .marquee:hover .marquee__track { animation-play-state: paused; }
+  .stream__player:hover .stream__cover { transform: scale(1.03); }
+  .stream__player:hover .play { transform: scale(1.1); }
+  .playlist a:hover strong { color: var(--beige); }
+  .schedule__row:hover { color: var(--white); padding-left: 20px; }
+  .schedule__row:hover::before { transform: scaleY(1); }
+  .schedule__row:hover .schedule__body span, .schedule__row:hover .schedule__place { color: var(--beige); }
+  .event:hover .event__img img { transform: scale(1.06); }
+  .event:hover .round-arrow { transform: rotate(-45deg); }
+  .pray-ways a:hover { background: var(--dark); color: var(--white); }
+  .pray-ways a:hover span { color: var(--beige); }
+  .socials a:hover { background: var(--light); }
+  .socials a:hover .socials__ic { background: var(--dark); color: var(--white); }
+  .insta a:hover img { transform: scale(1.06); }
+  .hero__photo:hover img, .school__big:hover img { transform: scale(1.03); }
+  .footer ul a:hover { color: var(--dark); }
+}
+
 /* ── Телефони: без анімацій (щоб не лагало) ─────────────── */
 @media (max-width: 760px), (hover: none) and (pointer: coarse) {
   html { scroll-behavior: auto; }
@@ -481,7 +501,8 @@ ol, ul { list-style: none; padding: 0; }
   .split__ch { transform: none; }
   .photo--reveal .photo__inner { clip-path: none; }
   .photo--reveal .hero__card { opacity: 1; transform: none; }
-  .marquee__track { animation: none; }
+  .marquee__track { animation: marquee 40s linear infinite !important; will-change: transform; }
+  .btn, .btn__arrow, .burger__icon i, .menu__close { transition: background .25s, color .25s, border-color .25s, transform .25s, width .3s !important; }
   .star3d { opacity: 1; }
   .header { backdrop-filter: none; background: var(--white); }
   .menu__list li { opacity: 1; transform: none; }

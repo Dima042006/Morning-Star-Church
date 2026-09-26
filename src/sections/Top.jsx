@@ -15,7 +15,7 @@ export function Hero({ clock }) {
   return (
     <section className="hero wrap" id="top">
       <div className="hero__meta">
-        <Eyebrow>{church.full} · {church.city}</Eyebrow>
+        <Eyebrow><span className="only-desktop">{church.full} · {church.city}</span><span className="only-mobile">Церква ХВЄ · {church.city}</span></Eyebrow>
         <span className="hero__when">Неділя · 10:00 і 18:00</span>
       </div>
       <SplitTitle as="h1" className="hero__title" text={church.name} immediate step={45} />
