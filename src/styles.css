@@ -402,7 +402,10 @@ html.is-loading .photo--reveal .photo__inner { clip-path: inset(0 0 100% 0) !imp
   :root { --pad: 20px; }
   body { font-size: 16px; }
   .page::before, .page::after { display: none; }
+  .header { position: relative; top: 0; }
+  html { scroll-padding-top: 0; }
   .header__row { height: 64px; }
+  html { scroll-padding-top: 0; }
   .logo__name { font-size: 18px; }
   .header__live { display: none; }
   .hero { padding-top: 24px; }
