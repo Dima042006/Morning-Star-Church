@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://dima042006.github.io/Morning-Star-Church/sitemap.xml

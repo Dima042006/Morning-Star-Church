@@ -70,3 +70,10 @@ src/
 4. Сайт буде доступний за адресою `https://<ваш-логін>.github.io/<назва-репозиторію>/`.
 
 Після кожної зміни файлів у гілці `main` сайт оновлюється сам.
+
+## SEO, соцмережі та іконки
+
+- **Мета-теги** (назва, опис, ключові слова) та **Open Graph / Twitter** — у `index.html`. Якщо сайт переїде на власний домен, замініть адресу `https://dima042006.github.io/Morning-Star-Church/` в `index.html`, `public/robots.txt` і `public/sitemap.xml`.
+- **OG-фото** для прев'ю в Facebook, Telegram, Viber — `public/og-image.jpg` (1200×630).
+- **Фавіконки** — `public/favicon.svg`, `favicon.ico`, `favicon-32.png`, `apple-touch-icon.png`, `icon-192/512.png`, `site.webmanifest`.
+- **Дані для Google** (адреса, час зібрань, соцмережі) — блок `application/ld+json` в `index.html`.

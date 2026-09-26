@@ -476,6 +476,18 @@ html.is-loading .photo--reveal .photo__inner { clip-path: inset(0 0 100% 0) !imp
   .footer__grid { grid-template-columns: 1fr; gap: 36px; }
   .footer__giant { font-size: 16vw; white-space: normal; line-height: .95; }
   .subscribe .btn { padding: 14px 16px; }
+  /* усі кнопки на всю ширину */
+  .btn { width: 100%; }
+  .btn-stack, .btn-row { width: 100%; align-items: stretch; }
+  .btn-row { flex-direction: column; }
+  .section__head > .btn { width: 100%; }
+  .school__text { justify-items: stretch; min-width: 0; }
+  .h2--xl { font-size: 14vw; }
+  .subscribe { flex-direction: column; gap: 5px; }
+  .subscribe input { padding: 14px 16px; }
+  .iban .btn { width: 100%; }
+  .prayer__form { justify-items: stretch; }
+  .prayer__done { justify-items: stretch; }
   .menu__top { height: 65px; }
 }
 
