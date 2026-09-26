@@ -10,7 +10,8 @@ import { useServiceClock } from './hooks';
 import { church } from './data';
 
 export default function App() {
-  const clock = useServiceClock(church.services);
+  // оновлення раз на 30 с: вистачає для шапки й першого екрана (щосекундний таймер живе лише в блоці трансляції)
+  const clock = useServiceClock(church.services, 30000);
   return (
     <div className="page">
       <a className="skip" href="#main">Перейти до змісту</a>
@@ -19,7 +20,7 @@ export default function App() {
         <Hero clock={clock} />
         <InfoBar />
         <Marquee />
-        <Stream clock={clock} />
+        <Stream />
         <Schedule />
         <FirstVisit />
         <SundaySchool />

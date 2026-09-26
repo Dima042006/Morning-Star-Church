@@ -3,10 +3,12 @@ import Star3D from '../components/Star3D';
 import StarMark from '../components/StarMark';
 import { Button, Eyebrow, Photo, SplitTitle } from '../components/ui';
 import { church, hero } from '../data';
+import { useLiteMode } from '../hooks';
 
 const hhmm = (d) => `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
 
 export function Hero({ clock }) {
+  const lite = useLiteMode();
   const d = clock.next;
   const days = ['Неділя', 'Понеділок', 'Вівторок', 'Середа', 'Четвер', 'Пʼятниця', 'Субота'];
   const dateStr = `${days[d.getDay()]}, ${d.toLocaleDateString('uk-UA', { day: 'numeric', month: 'long' })}`;
@@ -19,7 +21,7 @@ export function Hero({ clock }) {
       <SplitTitle as="h1" className="hero__title" text={church.name} immediate step={45} />
       <div className="hero__grid">
         <div className="hero__side">
-          <div className="hero__star"><Star3D /></div>
+          <div className="hero__star">{lite ? <StarMark size={240} className="hero__star-static" /> : <Star3D />}</div>
           <div className="hero__text">
             <p className="lead">{hero.lead}</p>
             <div className="btn-stack">

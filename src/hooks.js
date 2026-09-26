@@ -21,12 +21,12 @@ export function useInView(options = { threshold: 0.25 }) {
 }
 
 /** Найближче з недільних служінь та стан «наживо» */
-export function useServiceClock(services) {
+export function useServiceClock(services, intervalMs = 1000) {
   const [now, setNow] = useState(() => new Date());
   useEffect(() => {
-    const id = setInterval(() => setNow(new Date()), 1000);
+    const id = setInterval(() => setNow(new Date()), intervalMs);
     return () => clearInterval(id);
-  }, []);
+  }, [intervalMs]);
 
   let live = false, liveAt = null, next = null;
   for (const { weekday, hour, minute, durationMin } of services) {
@@ -56,4 +56,18 @@ export function useNow() {
     return () => clearInterval(id);
   }, []);
   return now;
+}
+
+/** «Легкий режим»: телефони та планшети, або коли в системі вимкнено анімації */
+const LITE_QUERY = '(max-width: 760px), (hover: none) and (pointer: coarse), (prefers-reduced-motion: reduce)';
+export function useLiteMode() {
+  const get = () => typeof window !== 'undefined' && window.matchMedia(LITE_QUERY).matches;
+  const [lite, setLite] = useState(get);
+  useEffect(() => {
+    const mq = window.matchMedia(LITE_QUERY);
+    const on = () => setLite(mq.matches);
+    mq.addEventListener('change', on);
+    return () => mq.removeEventListener('change', on);
+  }, []);
+  return lite;
 }

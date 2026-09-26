@@ -1,11 +1,13 @@
 import React from 'react';
 import { Button, Eyebrow, Photo, SplitTitle } from '../components/ui';
 import { church, recordings, stream } from '../data';
+import { useServiceClock } from '../hooks';
 
 const pad = (n) => String(n).padStart(2, '0');
 const hhmm = (d) => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
 
-export default function Stream({ clock }) {
+export default function Stream() {
+  const clock = useServiceClock(church.services, 1000);
   const { live, parts } = clock;
   return (
     <section className="section section--dark" id="stream">

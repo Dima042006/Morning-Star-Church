@@ -474,6 +474,20 @@ ol, ul { list-style: none; padding: 0; }
   .menu { padding-inline: 24px; }
 }
 
+/* ── Телефони: без анімацій (щоб не лагало) ─────────────── */
+@media (max-width: 760px), (hover: none) and (pointer: coarse) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .split__ch { transform: none; }
+  .photo--reveal .photo__inner { clip-path: none; }
+  .photo--reveal .hero__card { opacity: 1; transform: none; }
+  .marquee__track { animation: none; }
+  .star3d { opacity: 1; }
+  .header { backdrop-filter: none; background: var(--white); }
+  .menu__list li { opacity: 1; transform: none; }
+}
+.hero__star-static { width: 100%; height: 100%; }
+
 /* ── Зменшений рух ───────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
