@@ -109,7 +109,7 @@ html.is-loading .photo--reveal .photo__inner { clip-path: inset(0 0 100% 0) !imp
 .header__actions { display: flex; gap: 10px; }
 .header__live { padding: 14px 20px; }
 .header__live.is-live .btn__dot { animation: pulse 1.4s infinite; }
-.burger { display: inline-flex; align-items: center; gap: 14px; padding: 14px 20px; background: var(--dark); color: var(--white); border: 0; cursor: pointer; font-weight: 500; font-size: 15px; }
+.burger { display: inline-flex; align-items: center; justify-content: space-between; min-width: 136px; gap: 14px; padding: 14px 20px; background: var(--dark); color: var(--white); border: 0; cursor: pointer; font-weight: 500; font-size: 15px; }
 .burger__icon { display: grid; gap: 5px; width: 22px; }
 .burger__icon i { display: block; height: 2px; background: currentColor; transition: width .3s var(--ease); }
 .burger__icon i:nth-child(2) { width: 70%; }
@@ -119,13 +119,16 @@ html.is-loading .photo--reveal .photo__inner { clip-path: inset(0 0 100% 0) !imp
 .menu-dim.is-open { opacity: 1; pointer-events: auto; }
 .menu { position: fixed; z-index: 60; top: 0; bottom: 0; left: 0; width: min(460px, 100vw); background: var(--dark); color: var(--white);
   display: flex; flex-direction: column; justify-content: space-between; gap: 24px;
-  padding: calc(28px + env(safe-area-inset-top, 0px)) 40px calc(32px + env(safe-area-inset-bottom, 0px));
+  padding: env(safe-area-inset-top, 0px) var(--pad) calc(32px + env(safe-area-inset-bottom, 0px));
   transform: translateX(-100%); visibility: hidden; transition: transform .5s cubic-bezier(.7, 0, .2, 1), visibility 0s .5s, box-shadow .5s; overflow-y: auto; }
 .menu.is-open { transform: none; visibility: visible; transition: transform .5s cubic-bezier(.7, 0, .2, 1), visibility 0s, box-shadow .5s; box-shadow: 30px 0 80px -30px rgb(0 0 0 / .5); }
-.menu__top { display: flex; align-items: center; justify-content: space-between; }
-.menu__top .logo__name { font-size: 19px; }
-.menu__close { background: none; border: 1px solid var(--dline); color: var(--white); padding: 11px 15px; cursor: pointer; font-size: 14px; }
-.menu__close:hover { border-color: var(--white); }
+.menu__top { display: flex; align-items: center; justify-content: space-between; flex: none; height: 77px; margin-inline: calc(-1 * var(--pad)); padding-inline: var(--pad); border-bottom: 1px solid var(--dline); }
+.burger--light { background: var(--white); color: var(--dark); }
+.burger__icon.is-x { height: 16px; position: relative; display: block; }
+.burger__icon.is-x i { position: absolute; left: 0; top: 7px; width: 100% !important; }
+.burger__icon.is-x i:nth-child(1) { transform: rotate(45deg); }
+.burger__icon.is-x i:nth-child(2) { opacity: 0; }
+.burger__icon.is-x i:nth-child(3) { transform: rotate(-45deg); }
 .menu__list li { border-bottom: 1px solid var(--dline); opacity: 0; transform: translateX(-24px); transition: opacity .4s, transform .5s var(--ease); }
 .menu.is-open .menu__list li { opacity: 1; transform: none; transition-delay: calc(var(--i) * 35ms + 180ms); }
 .menu__list a { display: flex; align-items: baseline; gap: 16px; padding: 7px 0; color: var(--beige); transition: color .2s, padding .3s var(--ease); }
@@ -472,7 +475,7 @@ html.is-loading .photo--reveal .photo__inner { clip-path: inset(0 0 100% 0) !imp
   .footer__grid { grid-template-columns: 1fr; gap: 36px; }
   .footer__giant { font-size: 16vw; white-space: normal; line-height: .95; }
   .subscribe .btn { padding: 14px 16px; }
-  .menu { padding-inline: 24px; }
+  .menu__top { height: 65px; }
 }
 
 /* ── Ефекти наведення — лише там, де є миша (на телефонах їх немає, крім кнопок) ── */

@@ -61,8 +61,14 @@ export default function Header({ live }) {
       <div className={`menu-dim ${open ? 'is-open' : ''}`} onClick={close} aria-hidden="true" />
       <aside id="menu" data-lenis-prevent className={`menu ${open ? 'is-open' : ''}`} aria-label="Меню сайту" aria-hidden={!open} inert={open ? undefined : ''}>
         <div className="menu__top">
-          <span className="logo logo--light"><StarMark size={34} dark /><span className="logo__name">{church.name}</span></span>
-          <button ref={closeRef} className="menu__close" onClick={close}>✕ Закрити</button>
+          <a className="logo logo--light" href="#top" onClick={() => setOpen(false)} aria-label={`${church.name} — на головну`}>
+            <StarMark size={38} dark />
+            <span className="logo__name">{church.name}</span>
+          </a>
+          <button ref={closeRef} className="burger burger--light menu__close" onClick={close}>
+            <span>Закрити</span>
+            <span className="burger__icon is-x" aria-hidden="true"><i /><i /><i /></span>
+          </button>
         </div>
         <nav>
           <ol className="menu__list">
