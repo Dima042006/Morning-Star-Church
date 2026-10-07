@@ -3,9 +3,8 @@ import Lenis from 'lenis';
 import Header from './components/Header';
 import { Hero, InfoBar, Marquee } from './sections/Top';
 import Stream from './sections/Stream';
-import { Events, FirstVisit, Holidays, Schedule, SundaySchool } from './sections/Middle';
-import Leaders from './sections/People';
-import { Donate, Prayer } from './sections/Giving';
+import { FirstVisit, Holidays, Schedule, SundaySchool } from './sections/Middle';
+import { Prayer } from './sections/Giving';
 import { Footer, Social } from './sections/Bottom';
 import { useLiteMode, useServiceClock } from './hooks';
 import { church } from './data';
@@ -35,10 +34,7 @@ export default function App() {
         <Schedule />
         <FirstVisit />
         <SundaySchool />
-        <Events />
         <Holidays />
-        <Leaders />
-        <Donate />
         <Prayer />
         <Social />
       </main>

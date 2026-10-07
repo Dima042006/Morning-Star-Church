@@ -45,10 +45,7 @@ export const nav = [
   { id: 'schedule', label: 'Розклад' },
   { id: 'first-visit', label: 'Вперше у нас' },
   { id: 'sunday-school', label: 'Недільна школа' },
-  { id: 'events', label: 'Події' },
   { id: 'holidays', label: 'Свята' },
-  { id: 'leaders', label: 'Служителі' },
-  { id: 'donate', label: 'Пожертви' },
   { id: 'prayer', label: 'Молитовні потреби' },
   { id: 'contacts', label: 'Контакти' },
 ];

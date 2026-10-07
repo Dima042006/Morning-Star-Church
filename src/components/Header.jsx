@@ -89,7 +89,7 @@ export default function Header({ live }) {
           </dl>
           <div className="menu__btns">
             <Button href="#stream" variant="outline-light" arrow={false} dot onClick={() => setOpen(false)}>Наживо</Button>
-            <Button href="#donate" variant="light" onClick={() => setOpen(false)}>Пожертвувати</Button>
+            <Button href="#prayer" variant="light" onClick={() => setOpen(false)}>Молитовне прохання</Button>
           </div>
           <ul className="menu__socials">
             {socials.map((s) => <li key={s.name}><a href={s.url} target="_blank" rel="noreferrer">{s.name}</a></li>)}
