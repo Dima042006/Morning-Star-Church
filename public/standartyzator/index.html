@@ -192,11 +192,14 @@ var lastBuild = null;
 var $ = function (id) { return document.getElementById(id); };
 
 /* ===================== ЗВ'ЯЗОК З GOOGLE DRIVE (Apps Script API) ===================== */
-var API_URL = 'https://script.google.com/macros/s/AKfycbxjelvirQ4QwRidQXiZiUQjtxL_Ta66ETETgeXwoJIOte30cWDZot8FY9YGGwFbg2FSyg/exec';
+var DEFAULT_API_URL = 'https://script.google.com/macros/s/AKfycbxjelvirQ4QwRidQXiZiUQjtxL_Ta66ETETgeXwoJIOte30cWDZot8FY9YGGwFbg2FSyg/exec';
+function apiUrl() {
+  try { return localStorage.getItem('apiUrl') || DEFAULT_API_URL; } catch (e) { return DEFAULT_API_URL; }
+}
 function apiKey() { try { return localStorage.getItem('apiKey') || ''; } catch (e) { return ''; } }
 function server(fn) {
   var args = Array.prototype.slice.call(arguments, 1);
-  return fetch(API_URL, {
+  return fetch(apiUrl(), {
     method: 'POST', redirect: 'follow',
     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
     body: JSON.stringify({ key: apiKey(), fn: fn, args: args })
@@ -918,13 +921,22 @@ async function loadRecent() {
 }
 
 function setupKeyAndInstall() {
-  var m = location.hash.match(/key=([^&]+)/);               // посилання виду .../#key=XXXX
-  if (m) {
-    try { localStorage.setItem('apiKey', decodeURIComponent(m[1])); } catch (e) {}
+  // посилання виду .../#key=КЛЮЧ&api=ID_РОЗГОРТАННЯ (або повна адреса .../exec)
+  var m = location.hash.match(/key=([^&]+)/);
+  var a = location.hash.match(/api=([^&]+)/);
+  if (m || a) {
+    try {
+      if (m) localStorage.setItem('apiKey', decodeURIComponent(m[1]));
+      if (a) {
+        var v = decodeURIComponent(a[1]);
+        if (!/^https:/.test(v)) v = 'https://script.google.com/macros/s/' + v + '/exec';
+        localStorage.setItem('apiUrl', v);
+      }
+    } catch (e) {}
     history.replaceState(null, '', location.pathname + location.search);
   }
   window.addEventListener('hashchange', function () {        // посилання з ключем у вже відкритій вкладці
-    if (/key=/.test(location.hash)) location.reload();
+    if (/key=|api=/.test(location.hash)) location.reload();
   });
   $('keySave').addEventListener('click', function () {
     var k = $('keyInput').value.trim();
