@@ -133,6 +133,16 @@
 </div></div>
 
 <script>
+/* будь-яка помилка показується внизу, а не «вічне завантаження» */
+window.addEventListener('error', function (e) {
+  var el = document.getElementById('status');
+  if (el) el.textContent = 'Помилка програми: ' + (e.message || e) + ' — надішліть цей текст розробнику';
+});
+window.addEventListener('unhandledrejection', function (e) {
+  var el = document.getElementById('status');
+  if (el && /Завантаження/.test(el.textContent)) el.textContent = 'Помилка: ' + ((e.reason && e.reason.message) || e.reason);
+});
+
 /* ===================== НАЛАШТУВАННЯ (як у програмі) ===================== */
 var W = 13.333333, H = 13.333333 * 9 / 21;        // 21:9, дюйми
 var MAX_SIZE = 56, MIN_SIZE = 28, WIDTH_SAFETY = 1.04;
@@ -175,7 +185,12 @@ var KEYWORDS = {
 };
 var KEYWORD_RE = {};
 Object.keys(KEYWORDS).forEach(function (k) {
-  KEYWORD_RE[k] = new RegExp('(?<![\\p{L}\\p{N}])(?:' + KEYWORDS[k] + ')(?![\\p{L}\\p{N}])', 'giu');
+  // без «lookbehind» — його не розуміють старіші iPhone (iOS до 16.4)
+  try {
+    KEYWORD_RE[k] = new RegExp('(^|[^\\p{L}\\p{N}])(?:' + KEYWORDS[k] + ')(?![\\p{L}\\p{N}])', 'giu');
+  } catch (e) {
+    KEYWORD_RE[k] = new RegExp('(^|[^a-zа-яіїєґё0-9])(?:' + KEYWORDS[k].replace(/\\p\{L\}\*/g, '[a-zа-яіїєґё]*') + ')(?![a-zа-яіїєґё0-9])', 'gi');
+  }
 });
 var NO_BREAK_AFTER = new Set(('і й та а але або чи що щоб як де коли бо хоч хай нехай ні не ну то же ж б би ' +
   'в у з із зі зо до на по за під над від для про при без через між перед о об к ко ' +
@@ -199,15 +214,19 @@ function apiUrl() {
 function apiKey() { try { return localStorage.getItem('apiKey') || ''; } catch (e) { return ''; } }
 function server(fn) {
   var args = Array.prototype.slice.call(arguments, 1);
+  var ctrl = window.AbortController ? new AbortController() : null;
+  var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, fn === 'savePresentation' ? 180000 : 60000) : null;
   return fetch(apiUrl(), {
-    method: 'POST', redirect: 'follow',
+    method: 'POST', redirect: 'follow', signal: ctrl ? ctrl.signal : undefined,
     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
     body: JSON.stringify({ key: apiKey(), fn: fn, args: args })
-  }).catch(function () {
+  }).catch(function (e) {
+    if (e && e.name === 'AbortError') throw new Error('Google довго не відповідає — спробуйте ще раз (або перевірте інтернет)');
     throw new Error(navigator.onLine === false
       ? 'немає інтернету'
       : 'сервер Google не відповідає. Перевірте в Apps Script: «Розгорнути» → «Керувати розгортаннями» → олівець → доступ «Усі» → «Нова версія» → «Розгорнути»');
   }).then(function (r) {
+    if (timer) clearTimeout(timer);
     return r.text().then(function (t) {
       var d;
       try { d = JSON.parse(t); } catch (e) {
