@@ -200,6 +200,10 @@ function server(fn) {
     method: 'POST', redirect: 'follow',
     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
     body: JSON.stringify({ key: apiKey(), fn: fn, args: args })
+  }).catch(function () {
+    throw new Error(navigator.onLine === false
+      ? 'немає інтернету'
+      : 'сервер Google не відповідає. Перевірте в Apps Script: «Розгорнути» → «Керувати розгортаннями» → олівець → доступ «Усі» → «Нова версія» → «Розгорнути»');
   }).then(function (r) {
     return r.text().then(function (t) {
       var d;
