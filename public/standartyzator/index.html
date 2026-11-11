@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Стандартизатор</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<meta name="theme-color" content="#0e0f13">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Стандартизатор">
+<script defer src="pptxgen.bundle.js"></script>
+<style>
+  :root { --bg:#0e0f13; --card:#181a21; --line:#2a2d37; --text:#f2f3f5; --muted:#9aa0ab; --accent:#e9a15a; }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body { margin:0; background:var(--bg); color:var(--text);
+    font:16px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  main { max-width:640px; margin:0 auto; padding:calc(16px + env(safe-area-inset-top)) 16px 120px; }
+  h1 { font-size:22px; margin:8px 0 2px; }
+  .sub { color:var(--muted); font-size:14px; margin-bottom:16px; }
+  label.f { display:block; font-size:13px; color:var(--muted); margin:14px 0 6px; }
+  input[type=text], textarea, select { font:inherit; width:100%; background:var(--card); color:var(--text);
+    border:1px solid var(--line); border-radius:12px; padding:12px; font-size:16px; }
+  textarea { min-height:240px; resize:vertical; line-height:1.45; }
+  details { background:var(--card); border:1px solid var(--line); border-radius:12px; margin-top:14px; }
+  summary { padding:12px 14px; cursor:pointer; font-weight:600; }
+  .opts { padding:4px 14px 14px; }
+  .row { display:flex; align-items:center; gap:10px; margin:10px 0; }
+  .row > span:first-child { flex:1; }
+  input[type=range] { flex:1.4; accent-color:var(--accent); }
+  input[type=checkbox] { width:22px; height:22px; accent-color:var(--accent); }
+  select { width:auto; padding:8px 10px; }
+  .hint { color:var(--muted); font-size:13px; margin-top:6px; }
+  .slides { display:grid; gap:10px; margin-top:16px; }
+  .slides canvas { width:100%; border-radius:8px; display:block; background:#000; }
+  .bar { position:fixed; left:0; right:0; bottom:0; padding:12px 16px calc(12px + env(safe-area-inset-bottom));
+    background:rgba(14,15,19,.94); backdrop-filter:blur(8px); border-top:1px solid var(--line); }
+  .bar .in { max-width:640px; margin:0 auto; }
+  button.main { width:100%; padding:15px; border:0; border-radius:14px; background:var(--accent);
+    color:#1a1206; font-size:17px; font-weight:700; }
+  button.main:disabled { opacity:.45; }
+  .status { font-size:14px; color:var(--muted); margin-top:8px; min-height:1.2em; text-align:center; }
+  .status a { color:var(--accent); }
+  .recent a { color:var(--text); text-decoration:none; display:block; padding:8px 0; border-bottom:1px solid var(--line); font-size:15px; }
+  .recent small { color:var(--muted); }
+  .tabs { display:flex; background:var(--card); border:1px solid var(--line); border-radius:12px; padding:4px; gap:4px; margin-bottom:6px; }
+  .tabs button { flex:1; padding:10px; border:0; border-radius:9px; background:transparent; color:var(--muted); font:inherit; font-weight:600; }
+  .tabs button.on { background:var(--accent); color:#1a1206; }
+  .btn { display:block; width:100%; text-align:center; padding:13px; margin-top:10px; border:1px solid var(--line);
+    border-radius:12px; background:var(--card); color:var(--text); font:inherit; font-weight:600; cursor:pointer; }
+  .file { background:var(--card); border:1px solid var(--line); border-radius:12px; margin-top:10px; }
+  .file summary { font-weight:600; }
+  .file .meta { color:var(--muted); font-size:13px; font-weight:400; }
+  .file .slides { padding:0 10px 10px; margin-top:0; }
+  [hidden] { display:none !important; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px; margin:10px 0; }
+  .card b { display:block; margin-bottom:6px; }
+  .card .btn { margin-top:10px; }
+  .install { font-size:14px; color:var(--text); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Стандартизатор</h1>
+  <div class="sub">Презентації за одним стандартом — одразу у Google Drive.</div>
+
+  <div class="card" id="keyBox" hidden>
+    <b>🔑 Ключ доступу</b>
+    <div class="hint">Вставте ключ, який дав адміністратор (або відкрийте посилання з ключем).</div>
+    <input id="keyInput" type="text" placeholder="Ключ" autocomplete="off" style="margin-top:10px">
+    <button class="btn" id="keySave">Зберегти</button>
+  </div>
+  <div class="card install" id="installHint" hidden>
+    📲 Встановіть як програму: натисніть <b style="display:inline">Поділитися</b> ⬆️ внизу Safari →
+    <b style="display:inline">На початковий екран</b>. Далі відкривайте з іконки — працює швидше і без інтернету.
+    <button class="btn" id="installClose">Зрозуміло</button>
+  </div>
+
+  <div class="tabs">
+    <button id="tabNewBtn" class="on">Новий текст</button>
+    <button id="tabBatchBtn">Готові презентації</button>
+  </div>
+
+  <section id="tabNew">
+  <label class="f" for="title">Назва (файлу)</label>
+  <input id="title" type="text" placeholder="Напр.: Велика Божа любов" autocomplete="off">
+
+  <label class="f" for="text">Текст</label>
+  <textarea id="text" placeholder="Перший куплет…&#10;&#10;Приспів:&#10;Текст приспіву…&#10;&#10;Другий куплет…&#10;&#10;Приспів"></textarea>
+  <div class="hint">Порожній рядок — новий слайд. «Приспів:» на початку — це приспів.
+    Просто «Приспів» окремим блоком — повторити попередній приспів.</div>
+  </section>
+
+  <section id="tabBatch" hidden>
+    <div class="hint" style="margin-top:12px">Стандартизує вже готові презентації (.pptx) за тим самим алгоритмом.
+      Виберіть файли на телефоні або покладіть їх у Google Drive у папку
+      «Стандартизатор презентацій / Оригінали». Після збереження оригінали з Drive переносяться в «Оригінали / Готово».</div>
+    <label class="btn">📂 Вибрати файли .pptx
+      <input id="files" type="file" multiple hidden
+        accept=".pptx,application/vnd.openxmlformats-officedocument.presentationml.presentation"></label>
+    <button class="btn" id="fromDrive">☁️ Взяти всі з папки «Оригінали»</button>
+    <div id="batchList"></div>
+  </section>
+
+  <details id="optsBox">
+    <summary>Налаштування</summary>
+    <div class="opts">
+      <div class="row"><span>Затемнення фото</span>
+        <input id="overlay" type="range" min="0" max="100" step="5"><b id="overlayVal"></b></div>
+      <div class="row"><span>Шрифт</span><select id="family"></select></div>
+      <div class="row"><span>Товщина тексту</span><select id="weight"></select></div>
+      <div class="row"><span>Товщина приспіву</span><select id="chorusWeight"></select></div>
+      <div class="row"><span>Фото природи на фоні</span><input id="photos" type="checkbox"></div>
+      <div class="row"><span>Фото неба, якщо згадується небо</span><input id="sky" type="checkbox"></div>
+      <div class="row"><span>Перший слайд — назва</span><input id="titleSlide" type="checkbox"></div>
+    </div>
+  </details>
+
+  <div class="slides" id="slides"></div>
+
+  <details class="recent" id="recentBox">
+    <summary>Останні презентації</summary>
+    <div class="opts" id="recent"></div>
+  </details>
+</main>
+
+<div class="bar"><div class="in">
+  <button class="main" id="save" disabled>Зберегти в Google Drive</button>
+  <div class="status" id="status">Завантаження…</div>
+</div></div>
+
+<script>
+/* ===================== НАЛАШТУВАННЯ (як у програмі) ===================== */
+var W = 13.333333, H = 13.333333 * 9 / 21;        // 21:9, дюйми
+var MAX_SIZE = 56, MIN_SIZE = 28, WIDTH_SAFETY = 1.04;
+// Відстань між рядками: TARGET_LINE розмірів шрифту. У файл вона пишеться у відсотках
+// від «природної» висоти рядка шрифту (base) — так її однаково розуміють Keynote і PowerPoint.
+var LINE_HEIGHT = 1.25;
+var V_PAD = 0.05, H_PAD = 0.03;
+var CHORUS_LABEL = 'Приспів', CHORUS_LABEL_SIZE = 20;
+var FAMILIES = {   // base — «природна» висота рядка шрифту (для розрахунку інтервалу)
+  'Mariupol': { base: 1.13, weights: {   // вага: [файл, назва шрифту, жирний, штучний]
+    400: ['Mariupol-Regular', 'Mariupol', false, false],
+    700: ['Mariupol-Regular', 'Mariupol', true, true] } },
+  'Fixel Display': { base: 1.38, weights: {
+    100: ['FixelDisplay-Thin', 'Fixel Display Thin', false],
+    200: ['FixelDisplay-ExtraLight', 'Fixel Display ExtraLight', false],
+    300: ['FixelDisplay-Light', 'Fixel Display Light', false],
+    400: ['FixelDisplay-Regular', 'Fixel Display Regular', false],
+    500: ['FixelDisplay-Medium', 'Fixel Display Medium', false],
+    600: ['FixelDisplay-SemiBold', 'Fixel Display SemiBold', false],
+    700: ['FixelDisplay-Bold', 'Fixel Display Bold', true],
+    800: ['FixelDisplay-ExtraBold', 'Fixel Display ExtraBold', false],
+    900: ['FixelDisplay-Black', 'Fixel Display Black', false] } }
+};
+function fontInfo(weight) {
+  var fam = FAMILIES[settings.family] || FAMILIES['Mariupol'];
+  var ws = Object.keys(fam.weights).map(Number);
+  var best = ws.reduce(function (a, b) { return Math.abs(b - weight) < Math.abs(a - weight) ? b : a; }, ws[0]);
+  var f = fam.weights[best];
+  return { file: f[0], face: f[1], bold: f[2], synthetic: !!f[3], weight: best, linePct: LINE_HEIGHT / fam.base };
+}
+var WEIGHT_NAMES = {100:'Thin',200:'ExtraLight',300:'Light',400:'Regular',500:'Medium',600:'SemiBold',700:'Bold',800:'ExtraBold',900:'Black'};
+var DEFAULTS = { family: 'Mariupol', overlay: 90, weight: 400, chorusWeight: 700, photos: true, sky: true, titleSlide: false };
+
+var L = '\\p{L}*';
+var KEYWORDS = {
+  'гори': 'гора|гори|горі|гору|горою|горам|горами|горах|гір|гор|горы|горой|гірськ'+L+'|горн'+L+'|вершин'+L+'|скел'+L+'|пагорб'+L+'|холм'+L+'|хребт'+L+'|сіон'+L+'|сион'+L+'|mountains?|hills?',
+  'вода': 'вода|води|воді|воду|водою|водами|водах|вод|водиці|водиця|воды|воде|водой|море|моря|морі|морю|морем|морях|морям|морськ'+L+'|морск'+L+'|океан'+L+'|ріка|ріки|ріці|ріку|рікою|річк'+L+'|река|реки|реке|реку|рекой|хвил'+L+'|волн'+L+'|озер'+L+'|потік|потоки|потоку|поток'+L+'|джерел'+L+'|источник'+L+'|струм'+L+'|руч'+L+'|дощ'+L+'|дожд'+L+'|йордан'+L+'|иордан'+L+'|waters?|seas?|ocean|rivers?|lake|rain',
+  'земля': 'земл'+L+'|поле|поля|полі|полях|полям|полем|лук|луки|луках|луг'+L+'|трав'+L+'|ліс|лісу|лісом|ліси|лісах|лес|леса|лесу|лесом|лесах|сад'+L+'|долин'+L+'|зелен'+L+'|квіт'+L+'|нив'+L+'|пасовищ'+L+'|пастбищ'+L+'|дерев'+L+'|earth|land|fields?|grass|green|forests?|trees?|gardens?|valley',
+  'небо': 'небо|неба|небі|небу|небом|небес'+L+'|небеса|небе|хмар'+L+'|облак'+L+'|туч[аіиу]'+L+'|зор[яіею]'+L+'|зірк'+L+'|звезд'+L+'|sky|skies|heavens?|clouds?|stars?'
+};
+var KEYWORD_RE = {};
+Object.keys(KEYWORDS).forEach(function (k) {
+  KEYWORD_RE[k] = new RegExp('(?<![\\p{L}\\p{N}])(?:' + KEYWORDS[k] + ')(?![\\p{L}\\p{N}])', 'giu');
+});
+var NO_BREAK_AFTER = new Set(('і й та а але або чи що щоб як де коли бо хоч хай нехай ні не ну то же ж б би ' +
+  'в у з із зі зо до на по за під над від для про при без через між перед о об к ко ' +
+  'и но да или ни во с со ото от из изо под ' +
+  'the a an and or but of to in on at by for with from as').split(' '));
+var PUNCT = /^[«»"'„“”()\[\],.;:!?…]+|[«»"'„“”()\[\],.;:!?…]+$/g;
+var CHORUS_RE = /^\s*(приспів|припев|рефрен|chorus|refrain)\s*\d*\s*[:.\-–—]?\s*/i;
+var SECTION_RE = /^\s*(куплет|verse|бридж|bridge|мост|кода|coda|інтро|intro|аутро|outro|тег|tag)\s*\d*\s*[:.\-–—]?\s*$/i;
+
+/* ===================== СТАН ===================== */
+var setup = null, settings = Object.assign({}, DEFAULTS);
+var fontLoaded = {}, photoCache = {};
+var lastBuild = null;
+var $ = function (id) { return document.getElementById(id); };
+
+/* ===================== ЗВ'ЯЗОК З GOOGLE DRIVE (Apps Script API) ===================== */
+var API_URL = 'https://script.google.com/macros/s/AKfycbxjelvirQ4QwRidQXiZiUQjtxL_Ta66ETETgeXwoJIOte30cWDZot8FY9YGGwFbg2FSyg/exec';
+function apiKey() { try { return localStorage.getItem('apiKey') || ''; } catch (e) { return ''; } }
+function server(fn) {
+  var args = Array.prototype.slice.call(arguments, 1);
+  return fetch(API_URL, {
+    method: 'POST', redirect: 'follow',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ key: apiKey(), fn: fn, args: args })
+  }).then(function (r) {
+    return r.text().then(function (t) {
+      var d;
+      try { d = JSON.parse(t); } catch (e) {
+        throw new Error('сервер не відповів (перевірте інтернет і що в розгортанні Apps Script доступ «Усі»)');
+      }
+      if (!d.ok) throw new Error(d.error || 'помилка сервера');
+      return d.result;
+    });
+  });
+}
+function loadLocalSettings() { try { return JSON.parse(localStorage.getItem('settings') || '{}'); } catch (e) { return {}; } }
+function status(html) { $('status').innerHTML = html; }
+
+/* ===================== ЛОКАЛЬНИЙ КЕШ (телефон пам'ятає фото і шрифти) ===================== */
+// На iPhone (Safari) сховище іноді «зависає» — тоді чекаємо максимум 1,5 с і працюємо без нього.
+function withTimeout(promise, ms, fallback) {
+  return Promise.race([promise, new Promise(function (r) { setTimeout(function () { r(fallback); }, ms); })]);
+}
+var idbPromise = null;
+function idb() {
+  if (!idbPromise) idbPromise = withTimeout(new Promise(function (resolve) {
+    try {
+      var req = indexedDB.open('standartyzator', 1);
+      req.onupgradeneeded = function () { req.result.createObjectStore('files'); };
+      req.onsuccess = function () { resolve(req.result); };
+      req.onerror = function () { resolve(null); };
+      req.onblocked = function () { resolve(null); };
+    } catch (e) { resolve(null); }
+  }), 1500, null);
+  return idbPromise;
+}
+async function cacheGet(key) {
+  var db = await idb(); if (!db) return null;
+  return withTimeout(new Promise(function (resolve) {
+    try {
+      var r = db.transaction('files').objectStore('files').get(key);
+      r.onsuccess = function () { resolve(r.result || null); };
+      r.onerror = function () { resolve(null); };
+    } catch (e) { resolve(null); }
+  }), 1500, null);
+}
+async function cacheSet(key, value) {
+  var db = await idb(); if (!db) return;
+  try { db.transaction('files', 'readwrite').objectStore('files').put(value, key); } catch (e) {}
+}
+async function fileBase64(id) {               // з кешу телефона або з Drive
+  var hit = await cacheGet('f:' + id);
+  if (hit) return hit;
+  var res = await server('getFileBase64', id);
+  cacheSet('f:' + id, res);
+  return res;
+}
+function waitForLib() {
+  return new Promise(function (resolve, reject) {
+    var n = 0;
+    (function check() {
+      if (window.PptxGenJS && window.JSZip) return resolve();
+      if (++n > 300) return reject(new Error('бібліотека не завантажилась, перевірте інтернет'));
+      setTimeout(check, 100);
+    })();
+  });
+}
+
+/* ===================== ШРИФТИ ===================== */
+function fontFamily(weight) { return 'f_' + fontInfo(weight).file; }
+async function loadFont(weight) {
+  var file = fontInfo(weight).file;
+  if (fontLoaded[file]) return fontLoaded[file];
+  fontLoaded[file] = (async function () {
+    var url = 'fonts/' + file + (file.indexOf('Mariupol') === 0 ? '.otf' : '.woff2');   // шрифти лежать поруч із програмою
+    var face = new FontFace('f_' + file, 'url(' + url + ')');
+    await face.load();
+    document.fonts.add(face);
+    return true;
+  })();
+  fontLoaded[file].catch(function () { delete fontLoaded[file]; });
+  return fontLoaded[file];
+}
+
+var measureCtx = document.createElement('canvas').getContext('2d');
+function measure(text, size, weight) {
+  measureCtx.font = size + 'px "' + fontFamily(weight) + '"';
+  var k = fontInfo(weight).synthetic ? 1.03 : 1;      // штучний жирний трохи ширший
+  return measureCtx.measureText(text).width * WIDTH_SAFETY * k;
+}
+
+/* ===================== РОЗБІР ТЕКСТУ ===================== */
+function parseText(raw) {
+  var blocks = raw.replace(/\r/g, '').split(/\n\s*\n/);
+  var slides = [], lastChorus = null;
+  blocks.forEach(function (block) {
+    var lines = block.split('\n').map(function (l) { return l.replace(/\s+/g, ' ').trim(); })
+                     .filter(function (l) { return l && !SECTION_RE.test(l); });
+    if (!lines.length) return;
+    var chorus = false;
+    if (CHORUS_RE.test(lines[0])) {
+      chorus = true;
+      var rest = lines[0].replace(CHORUS_RE, '').trim();
+      if (rest) lines[0] = rest.charAt(0).toUpperCase() + rest.slice(1); else lines.shift();
+      if (!lines.length) {                      // «Приспів» без тексту — повтор
+        if (lastChorus) slides.push({ lines: lastChorus.slice(), chorus: true });
+        return;
+      }
+      lastChorus = lines.slice();
+    } else if (lastChorus && lines.join('\n') === lastChorus.join('\n')) {
+      chorus = true;
+    }
+    slides.push({ lines: lines, chorus: chorus });
+  });
+  return slides;
+}
+
+/* ===================== ПЕРЕНОСИ І РОЗМІР ===================== */
+function tokens(text) {
+  var words = text.split(' '), out = [], carry = '';
+  words.forEach(function (w) {
+    if (out.length && !carry && /^[—–-]$/.test(w)) { out[out.length - 1] += ' ' + w; return; }
+    var token = carry ? carry + ' ' + w : w;
+    var bare = w.toLowerCase().replace(PUNCT, '');
+    if (NO_BREAK_AFTER.has(bare) && !/[,.!?:;]$/.test(w)) { carry = token; return; }
+    out.push(token); carry = '';
+  });
+  if (carry) { if (out.length) out[out.length - 1] += ' ' + carry; else out.push(carry); }
+  return out;
+}
+function greedy(toks, maxW, size, weight) {
+  var lines = [], cur = '';
+  toks.forEach(function (t) {
+    var cand = cur ? cur + ' ' + t : t;
+    if (cur && measure(cand, size, weight) > maxW) { lines.push(cur); cur = t; } else cur = cand;
+  });
+  if (cur) lines.push(cur);
+  return lines;
+}
+function wrapLine(text, size, weight, maxW) {
+  if (measure(text, size, weight) <= maxW) return [text];
+  var toks = tokens(text);
+  if (toks.length < 2) return [text];
+  var n = greedy(toks, maxW, size, weight).length;
+  var lo = 1, hi = measure(text, size, weight);
+  for (var i = 0; i < 30; i++) {
+    var mid = (lo + hi) / 2;
+    if (greedy(toks, mid, size, weight).length <= n) hi = mid; else lo = mid;
+  }
+  var lines = greedy(toks, hi, size, weight);
+  var k = 0;
+  while (lines.length > 1 && k < lines.length) {          // без рядків з одного слова
+    if (lines[k].split(' ').length < 2) {
+      var single = lines.splice(k, 1)[0];
+      if (k === lines.length) lines[k - 1] += ' ' + single; else lines[k] = single + ' ' + lines[k];
+      k = 0; continue;
+    }
+    k++;
+  }
+  return lines;
+}
+function textArea() { return { w: W * (1 - 2 * H_PAD) * 72, h: H * (1 - 2 * V_PAD) * 72 }; }
+function fits(lines, size, weight, wrap) {
+  var a = textArea();
+  if (wrap) {
+    var all = [];
+    lines.forEach(function (l) { all = all.concat(wrapLine(l, size, weight, a.w)); });
+    lines = all;
+  } else if (lines.some(function (l) { return measure(l, size, weight) > a.w; })) return false;
+  return lines.length * size * LINE_HEIGHT <= a.h;
+}
+function bestSize(lines, weight) {
+  for (var s = MAX_SIZE; s >= MIN_SIZE; s--) if (fits(lines, s, weight, false)) return s;
+  for (s = MAX_SIZE; s >= 12; s--) if (fits(lines, s, weight, true)) return s;
+  return 12;
+}
+
+/* ===================== ФОТО ===================== */
+function chooseCategory(text, useSky) {
+  var best = null, bestN = 0, order = ['небо', 'гори', 'вода', 'земля'];
+  order.forEach(function (cat) {
+    if (cat === 'небо' && !useSky) return;
+    var m = text.match(KEYWORD_RE[cat]);
+    var n = m ? m.length : 0;
+    if (n > bestN) { best = cat; bestN = n; }
+  });
+  return best || 'природа';
+}
+function PhotoPicker() {
+  var used = {}, previous = null;
+  var all = [];
+  ['гори', 'вода', 'земля', 'небо', 'природа'].forEach(function (c) { all = all.concat(setup.photos[c] || []); });
+  function take(p) { used[p.id] = (used[p.id] || 0) + 1; previous = p.id; return p; }
+  this.pick = function (cat) {
+    var stages = [setup.photos[cat] || [], setup.photos['природа'] || [], all];
+    for (var i = 0; i < stages.length; i++) {
+      var fresh = stages[i].filter(function (p) { return !used[p.id]; });
+      if (fresh.length) return take(fresh[0]);
+    }
+    var pools = [setup.photos[cat] || [], all];
+    for (i = 0; i < pools.length; i++) {
+      var opts = pools[i].filter(function (p) { return p.id !== previous; });
+      if (opts.length) {
+        opts.sort(function (a, b) { return (used[a.id] || 0) - (used[b.id] || 0) || all.indexOf(a) - all.indexOf(b); });
+        return take(opts[0]);
+      }
+    }
+    return all.length ? take(all[0]) : null;
+  };
+}
+function loadImage(src) {
+  return new Promise(function (resolve, reject) {
+    var img = new Image();
+    img.onload = function () { resolve(img); };
+    img.onerror = function () { reject(new Error('не вдалося відкрити фото')); };
+    img.src = src;
+  });
+}
+var optimizeQueue = Promise.resolve();
+function optimizeOnDrive(p, img) {           // великі фото один раз стискаються і замінюються на Drive
+  if (!p.size || p.size < 450 * 1024) return;
+  optimizeQueue = optimizeQueue.then(async function () {
+    try {
+      var scale = Math.min(1, 1920 / img.naturalWidth);
+      var c = document.createElement('canvas');
+      c.width = Math.round(img.naturalWidth * scale); c.height = Math.round(img.naturalHeight * scale);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      var b64 = c.toDataURL('image/jpeg', 0.82).split(',')[1];
+      var res = await server('replacePhoto', p.id, b64, p.name);
+      var prepared = await photoCache[p.id];
+      if (prepared) { cacheSet('p:' + res.id, prepared.url); photoCache[res.id] = Promise.resolve(prepared); }
+      p.id = res.id; p.name = res.name; p.size = res.size;
+    } catch (e) {}
+  });
+}
+async function preparedPhoto(p) {      // обрізка під 21:9, JPEG; зберігається на телефоні
+  if (photoCache[p.id]) return photoCache[p.id];
+  var id = p.id;
+  photoCache[id] = (async function () {
+    var cw = 1600, ch = Math.round(cw * H / W);
+    var c = document.createElement('canvas'); c.width = cw; c.height = ch;
+    var hit = await cacheGet('p:' + id);
+    if (hit) {
+      c.getContext('2d').drawImage(await loadImage(hit), 0, 0, cw, ch);
+      return { url: hit, canvas: c };
+    }
+    var res = await server('getFileBase64', id);
+    var img = await loadImage('data:' + res.mime + ';base64,' + res.data);
+    var scale = Math.max(cw / img.naturalWidth, ch / img.naturalHeight);
+    var dw = img.naturalWidth * scale, dh = img.naturalHeight * scale;
+    c.getContext('2d').drawImage(img, (cw - dw) / 2, (ch - dh) / 2, dw, dh);
+    var url = c.toDataURL('image/jpeg', 0.8);
+    cacheSet('p:' + id, url);
+    optimizeOnDrive(p, img);
+    return { url: url, canvas: c };
+  })();
+  photoCache[id].catch(function () { delete photoCache[id]; });
+  return photoCache[id];
+}
+
+/** Фонове завантаження шрифтів і фото, поки людина вставляє текст. */
+async function prefetch() {
+  try { await Promise.all([loadFont(settings.weight), loadFont(settings.chorusWeight)]); } catch (e) {}
+  if (!settings.photos) return;
+  var all = [];
+  ['гори', 'вода', 'земля', 'небо', 'природа'].forEach(function (c) { all = all.concat(setup.photos[c] || []); });
+  for (var i = 0; i < all.length; i += 2) {
+    await Promise.all(all.slice(i, i + 2).map(function (p) { return preparedPhoto(p).catch(function () {}); }));
+  }
+}
+
+/* ===================== ПОБУДОВА ===================== */
+async function build() {
+  var raw = $('text').value;
+  var slides = parseText(raw);
+  var title = $('title').value.trim();
+  if (settings.titleSlide && title) slides.unshift({ lines: [title], chorus: false });
+  if (!slides.length) return null;
+  return buildSlides(slides, title || (slides[0] && slides[0].lines[0]) || 'Презентація', function (msg) {
+    if (currentTab === 'new') status(msg);
+  });
+}
+
+/** Спільний алгоритм для нового тексту і для готових презентацій. */
+async function buildSlides(slides, title, progress) {
+  progress = progress || function () {};
+  slides = slides.map(function (s) { return { lines: s.lines.slice(), chorus: s.chorus }; });
+  progress('Завантажую шрифт…');
+  await Promise.all([loadFont(settings.weight), loadFont(settings.chorusWeight)]);
+
+  var size = MAX_SIZE;
+  slides.forEach(function (s) {
+    if (s.lines.length) size = Math.min(size, bestSize(s.lines, s.chorus ? settings.chorusWeight : settings.weight));
+  });
+  var a = textArea();
+  var picker = new PhotoPicker();
+  var picks = [];
+  slides.forEach(function (s) {
+    var w = s.chorus ? settings.chorusWeight : settings.weight;
+    s.weight = w;
+    s.wrapped = s.lines.map(function (l) { return wrapLine(l, size, w, a.w); });
+    s.photo = null;
+    picks.push(settings.photos && s.lines.length ? picker.pick(chooseCategory(s.lines.join(' '), settings.sky)) : null);
+  });
+  var total = picks.filter(Boolean).length, done = 0;
+  if (total) progress('Завантажую фото 0 з ' + total + '…');
+  var photos = await Promise.all(picks.map(function (p) {      // паралельно
+    if (!p) return null;
+    return preparedPhoto(p).then(function (x) { done++; progress('Завантажую фото ' + done + ' з ' + total + '…'); return x; },
+                                 function () { done++; return null; });   // фото не завантажилось — слайд буде чорний
+  }));
+  slides.forEach(function (s, i) { s.photo = photos[i]; });
+  return { slides: slides, size: size, title: title };
+}
+
+/* ---------- попередній перегляд ---------- */
+function drawPreview(canvas, s, size) {
+  var cssW = canvas.clientWidth || 600, dpr = window.devicePixelRatio || 1;
+  canvas.width = Math.round(cssW * dpr); canvas.height = Math.round(cssW * H / W * dpr);
+  var ctx = canvas.getContext('2d');
+  var k = canvas.width / (W * 72);                      // пікселів на пункт
+  ctx.fillStyle = '#000'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+  if (s.photo) {
+    ctx.drawImage(s.photo.canvas, 0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = 'rgba(0,0,0,' + settings.overlay / 100 + ')';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+  var lines = [];
+  s.wrapped.forEach(function (g) { lines = lines.concat(g); });
+  var lh = size * LINE_HEIGHT * k;
+  var y0 = canvas.height / 2 - lines.length * lh / 2;
+  ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.font = (size * k) + 'px "' + fontFamily(s.weight) + '"';
+  var fake = fontInfo(s.weight).synthetic;
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = size * k * 0.035; ctx.lineJoin = 'round';
+  lines.forEach(function (l, i) {
+    var y = y0 + lh * (i + 0.5);
+    ctx.fillText(l, canvas.width / 2, y);
+    if (fake) ctx.strokeText(l, canvas.width / 2, y);
+  });
+  if (s.chorus) {
+    ctx.font = (CHORUS_LABEL_SIZE * k) + 'px "' + fontFamily(settings.weight) + '"';
+    ctx.fillStyle = 'rgba(255,255,255,.75)'; ctx.textAlign = 'right'; ctx.textBaseline = 'bottom';
+    ctx.fillText(CHORUS_LABEL, canvas.width * 0.97, canvas.height * 0.96);
+  }
+}
+var previewTimer = null, buildSeq = 0;
+function schedulePreview() {
+  clearTimeout(previewTimer);
+  previewTimer = setTimeout(refreshPreview, 500);
+}
+async function refreshPreview() {
+  if (currentTab === 'batch') return;
+  var seq = ++buildSeq;
+  if (!$('text').value.trim()) {
+    $('slides').innerHTML = ''; $('save').disabled = true; status('Вставте текст пісні'); lastBuild = null; return;
+  }
+  status('Готую слайди…');
+  try {
+    var b = await build();
+    if (seq !== buildSeq) return;
+    lastBuild = b;
+    var box = $('slides'); box.innerHTML = '';
+    b.slides.forEach(function (s) {
+      var c = document.createElement('canvas'); box.appendChild(c); drawPreview(c, s, b.size);
+    });
+    $('save').disabled = !b.slides.length;
+    status(b.slides.length + ' слайд(ів) • розмір тексту ' + b.size);
+  } catch (e) {
+    status('Помилка: ' + (e && e.message || e));
+  }
+}
+
+/* ---------- PPTX ---------- */
+function makePptx(b) {
+  var pptx = new PptxGenJS();
+  pptx.defineLayout({ name: 'W21x9', width: W, height: H });
+  pptx.layout = 'W21x9';
+  pptx.title = b.title;
+  b.slides.forEach(function (s) {
+    var slide = pptx.addSlide();
+    slide.background = { color: '000000' };
+    if (s.photo) {
+      slide.addImage({ data: s.photo.url, x: 0, y: 0, w: W, h: H });
+      if (settings.overlay > 0) {
+        slide.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: W, h: H,
+          fill: { color: '000000', transparency: 100 - settings.overlay }, line: { type: 'none' } });
+      }
+    }
+    var f = fontInfo(s.weight);
+    var runs = [];
+    s.wrapped.forEach(function (group) {
+      group.forEach(function (line) { runs.push({ text: line, options: { breakLine: true } }); });
+    });
+    if (!runs.length) return;                       // порожній слайд — лише чорний фон
+    delete runs[runs.length - 1].options.breakLine;
+    slide.addText(runs, {
+      x: W * H_PAD, y: H * V_PAD, w: W * (1 - 2 * H_PAD), h: H * (1 - 2 * V_PAD),
+      margin: 0, align: 'center', valign: 'middle', fontFace: f.face, bold: f.bold,
+      fontSize: b.size, color: 'FFFFFF', lineSpacingMultiple: Math.round(f.linePct * 100) / 100,
+      paraSpaceBefore: 0, paraSpaceAfter: 0, fit: 'none', wrap: true
+    });
+    if (s.chorus) {
+      var lf = fontInfo(settings.weight);
+      slide.addText(CHORUS_LABEL, { x: W - 3 - W * 0.03, y: H - 0.6 - H * 0.04, w: 3, h: 0.6, margin: 0,
+        align: 'right', valign: 'bottom', fontFace: lf.face, bold: lf.bold, fontSize: CHORUS_LABEL_SIZE,
+        color: 'FFFFFF', transparency: 25 });
+    }
+  });
+  return pptx;
+}
+
+async function save() {
+  $('save').disabled = true;
+  try {
+    status('Створюю презентацію…');
+    await waitForLib();
+    var b = lastBuild || await build();
+    var pptx = makePptx(b);
+    var base64 = await pptx.write({ outputType: 'base64' });
+    status('Зберігаю в Google Drive…');
+    var res = await server('savePresentation', base64, b.title);
+    status('Збережено: <a href="' + res.url + '" target="_blank">' + res.name + '</a> • ' +
+           '<a href="' + setup.folderUrl + '" target="_blank">папка</a>');
+    loadRecent();
+  } catch (e) {
+    status('Не вдалося зберегти: ' + (e && e.message || e));
+  }
+  $('save').disabled = false;
+}
+
+/* ===================== ГОТОВІ ПРЕЗЕНТАЦІЇ ===================== */
+var NS_P = 'http://schemas.openxmlformats.org/presentationml/2006/main';
+var NS_A = 'http://schemas.openxmlformats.org/drawingml/2006/main';
+var NS_R = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships';
+var SKIP_PH = { dt: 1, ftr: 1, sldNum: 1, hdr: 1 };
+var batch = [];          // { name, driveId, parsed, result, state, error, el }
+
+function kids(el, ns, name) {
+  return Array.prototype.filter.call(el.children || [], function (c) {
+    return c.namespaceURI === ns && c.localName === name;
+  });
+}
+function kid(el, ns, name) { return kids(el, ns, name)[0] || null; }
+
+function paragraphInfo(p, info) {
+  var lines = [], cur = '';
+  Array.prototype.forEach.call(p.children, function (c) {
+    if (c.namespaceURI !== NS_A) return;
+    if (c.localName === 'r' || c.localName === 'fld') {
+      var t = kid(c, NS_A, 't'), text = t ? t.textContent : '';
+      cur += text;
+      var rPr = kid(c, NS_A, 'rPr'), n = text.trim().length;
+      info.chars += n;
+      if (rPr && /^(1|true)$/.test(rPr.getAttribute('b') || '')) info.bold += n;
+      if (rPr && /^(1|true)$/.test(rPr.getAttribute('i') || '')) info.italic += n;
+    } else if (c.localName === 'br') { lines.push(cur); cur = ''; }
+  });
+  lines.push(cur);
+  lines.forEach(function (l) { l = l.replace(/\s+/g, ' ').trim(); if (l) info.lines.push(l); });
+}
+
+function shapePos(el) {
+  var off = el.getElementsByTagNameNS(NS_A, 'off')[0];
+  return off ? { x: +off.getAttribute('x'), y: +off.getAttribute('y') } : null;
+}
+
+function collectTree(tree, info) {
+  var items = [];
+  Array.prototype.forEach.call(tree.children, function (el) {
+    if (el.namespaceURI !== NS_P) return;
+    var name = el.localName;
+    if (name !== 'sp' && name !== 'grpSp' && name !== 'graphicFrame') return;
+    var ph = el.getElementsByTagNameNS(NS_P, 'ph')[0];
+    var type = ph ? (ph.getAttribute('type') || 'body') : null;
+    if (type && SKIP_PH[type]) return;
+    var isTitle = type === 'title' || type === 'ctrTitle';
+    var pos = shapePos(el);
+    items.push({ el: el, title: isTitle, y: pos ? pos.y : (isTitle ? -1 : 1e12), x: pos ? pos.x : 0 });
+  });
+  var band = 0.3 * 914400;
+  items.sort(function (a, b) {
+    return (a.title ? 0 : 1) - (b.title ? 0 : 1) || Math.floor(a.y / band) - Math.floor(b.y / band) || a.x - b.x;
+  });
+  items.forEach(function (it) {
+    var el = it.el;
+    if (el.localName === 'grpSp') { collectTree(el, info); return; }
+    if (el.localName === 'sp') {
+      var tx = kid(el, NS_P, 'txBody');
+      if (tx) kids(tx, NS_A, 'p').forEach(function (p) { paragraphInfo(p, info); });
+      return;
+    }
+    var tbl = el.getElementsByTagNameNS(NS_A, 'tbl')[0];       // таблиця: рядок = рядок тексту
+    if (tbl) kids(tbl, NS_A, 'tr').forEach(function (tr) {
+      var cells = kids(tr, NS_A, 'tc').map(function (tc) { return tc.textContent.replace(/\s+/g, ' ').trim(); })
+                                      .filter(Boolean);
+      if (cells.length) info.lines.push(cells.join(' — '));
+    });
+  });
+}
+
+async function parsePptx(buffer) {
+  await waitForLib();
+  var zip = await JSZip.loadAsync(buffer);
+  var xml = async function (path) {
+    var f = zip.file(path);
+    return f ? new DOMParser().parseFromString(await f.async('string'), 'application/xml') : null;
+  };
+  var pres = await xml('ppt/presentation.xml');
+  var rels = await xml('ppt/_rels/presentation.xml.rels');
+  if (!pres || !rels) throw new Error('це не схоже на файл PowerPoint (.pptx)');
+  var targets = {};
+  Array.prototype.forEach.call(rels.getElementsByTagName('Relationship'), function (r) {
+    targets[r.getAttribute('Id')] = r.getAttribute('Target');
+  });
+  var infos = [];
+  var ids = pres.getElementsByTagNameNS(NS_P, 'sldId');
+  for (var i = 0; i < ids.length; i++) {
+    var target = targets[ids[i].getAttributeNS(NS_R, 'id')];
+    if (!target) continue;
+    var path = target.charAt(0) === '/' ? target.slice(1) : 'ppt/' + target.replace(/^\.\//, '');
+    var doc = await xml(path);
+    if (!doc || doc.documentElement.getAttribute('show') === '0') continue;    // приховані слайди
+    var info = { lines: [], chars: 0, bold: 0, italic: 0 };
+    var tree = doc.getElementsByTagNameNS(NS_P, 'spTree')[0];
+    if (tree) collectTree(tree, info);
+    infos.push(info);
+  }
+  return detectChoruses(infos);
+}
+
+/** Приспів: підпис «Приспів», або текст жирніший/курсивом, ніж на більшості слайдів,
+ *  або такий самий текст, як у вже знайденого приспіву. */
+function detectChoruses(infos) {
+  infos.forEach(function (i) {
+    i.label = false;
+    if (i.lines.length && CHORUS_RE.test(i.lines[0])) {
+      i.label = true;
+      var rest = i.lines[0].replace(CHORUS_RE, '').trim();
+      if (rest) i.lines[0] = rest.charAt(0).toUpperCase() + rest.slice(1); else i.lines.shift();
+    }
+    i.lines = i.lines.filter(function (l) { return !SECTION_RE.test(l); });
+  });
+  var withText = infos.filter(function (i) { return i.chars; });
+  var isBold = function (i) { return i.chars && i.bold > i.chars / 2; };
+  var isItalic = function (i) { return i.chars && i.italic > i.chars / 2; };
+  var mostBold = withText.filter(isBold).length > withText.length / 2;
+  var mostItalic = withText.filter(isItalic).length > withText.length / 2;
+  var chorusTexts = {};
+  infos.forEach(function (i, n) {
+    var different = (isBold(i) && !mostBold) || (isItalic(i) && !mostItalic);
+    var titleLike = n === 0 && i.lines.length <= 1 && (i.lines[0] || '').split(' ').length <= 6;
+    i.chorus = !!(i.label || (different && !titleLike));
+    if (i.chorus && i.lines.length) chorusTexts[i.lines.join('\n')] = 1;
+  });
+  infos.forEach(function (i) { if (!i.chorus && chorusTexts[i.lines.join('\n')]) i.chorus = true; });
+  return infos.map(function (i) { return { lines: i.lines, chorus: i.chorus }; });
+}
+
+function baseName(name) { return String(name).replace(/\.pptx$/i, ''); }
+
+function renderItem(item) {
+  if (!item.el) {
+    item.el = document.createElement('details');
+    item.el.className = 'file';
+    item.el.innerHTML = '<summary></summary><div class="slides"></div>';
+    item.el.addEventListener('toggle', function () { if (item.el.open) drawItem(item); });
+    $('batchList').appendChild(item.el);
+  }
+  var meta = {
+    wait: 'чекає…', work: 'обробляю…', error: '⚠️ ' + (item.error || 'помилка'),
+    saving: 'зберігаю…', saved: '✅ збережено'
+  }[item.state] || '';
+  if (item.state === 'ready' && item.result) {
+    var ch = item.result.slides.filter(function (s) { return s.chorus; }).length;
+    meta = item.result.slides.length + ' слайд(ів) • розмір ' + item.result.size + (ch ? ' • приспівів: ' + ch : '');
+  }
+  item.el.querySelector('summary').innerHTML = item.name.replace(/</g, '&lt;') + '<br><span class="meta">' + meta + '</span>';
+  if (item.el.open) drawItem(item);
+}
+function drawItem(item) {
+  var box = item.el.querySelector('.slides');
+  box.innerHTML = '';
+  if (!item.result) return;
+  item.result.slides.forEach(function (s) {
+    var c = document.createElement('canvas'); box.appendChild(c); drawPreview(c, s, item.result.size);
+  });
+}
+function updateBatchButton() {
+  if (currentTab !== 'batch') return;
+  var ready = batch.filter(function (i) { return i.state === 'ready'; }).length;
+  $('save').textContent = ready ? 'Зберегти всі в Google Drive (' + ready + ')' : 'Зберегти всі в Google Drive';
+  $('save').disabled = !ready || batchBusy;
+}
+
+var batchBusy = false;
+async function addToBatch(entries) {           // entries: [{ name, driveId?, load: async () => ArrayBuffer }]
+  batchBusy = true; updateBatchButton();
+  entries.forEach(function (e) { e.state = 'wait'; batch.push(e); renderItem(e); });
+  for (var i = 0; i < entries.length; i++) {
+    var item = entries[i];
+    item.state = 'work'; renderItem(item);
+    status('Обробляю ' + (i + 1) + ' із ' + entries.length + '…');
+    try {
+      if (!/\.pptx$/i.test(item.name)) throw new Error('потрібен файл .pptx (старий .ppt спершу збережіть як .pptx)');
+      item.parsed = await parsePptx(await item.load());
+      if (!item.parsed.length) throw new Error('немає слайдів');
+      item.result = await buildSlides(item.parsed, baseName(item.name));
+      item.state = 'ready';
+    } catch (e) {
+      item.state = 'error'; item.error = (e && e.message) || String(e);
+    }
+    renderItem(item);
+  }
+  batchBusy = false;
+  status('Перевірте слайди (натисніть на назву) і збережіть.');
+  updateBatchButton();
+}
+
+async function rebuildBatch() {               // після зміни налаштувань
+  for (var i = 0; i < batch.length; i++) {
+    var item = batch[i];
+    if (item.state !== 'ready' || !item.parsed) continue;
+    item.result = await buildSlides(item.parsed, baseName(item.name));
+    renderItem(item);
+  }
+}
+
+async function saveBatch() {
+  batchBusy = true; updateBatchButton();
+  var todo = batch.filter(function (i) { return i.state === 'ready'; });
+  var ok = 0;
+  for (var i = 0; i < todo.length; i++) {
+    var item = todo[i];
+    item.state = 'saving'; renderItem(item);
+    status('Зберігаю ' + (i + 1) + ' із ' + todo.length + '…');
+    try {
+      await waitForLib();
+      var base64 = await makePptx(item.result).write({ outputType: 'base64' });
+      await server('savePresentation', base64, item.result.title);
+      if (item.driveId) await server('markOriginalDone', item.driveId);
+      item.state = 'saved'; ok++;
+    } catch (e) {
+      item.state = 'error'; item.error = 'не збереглося: ' + ((e && e.message) || e);
+    }
+    renderItem(item);
+  }
+  batchBusy = false;
+  status('Збережено ' + ok + ' із ' + todo.length + ' • <a href="' + setup.folderUrl + '" target="_blank">папка</a>');
+  updateBatchButton();
+  loadRecent();
+}
+
+var currentTab = 'new';
+function switchTab(tab) {
+  currentTab = tab;
+  $('tabNewBtn').classList.toggle('on', tab === 'new');
+  $('tabBatchBtn').classList.toggle('on', tab === 'batch');
+  $('tabNew').hidden = tab !== 'new';
+  $('slides').hidden = tab !== 'new';
+  $('tabBatch').hidden = tab !== 'batch';
+  if (tab === 'batch') { updateBatchButton(); status(batch.length ? 'Перевірте слайди і збережіть.' : 'Виберіть файли або візьміть з папки «Оригінали».'); }
+  else { $('save').textContent = 'Зберегти в Google Drive'; $('save').disabled = !lastBuild; refreshPreview(); }
+}
+
+/* ===================== НАЛАШТУВАННЯ І СТАРТ ===================== */
+function fillFamilies() {
+  var sel = $('family'); sel.innerHTML = '';
+  Object.keys(FAMILIES).forEach(function (f) {
+    var o = document.createElement('option'); o.value = f; o.textContent = f; sel.appendChild(o);
+  });
+}
+function fillWeights() {
+  var fam = FAMILIES[settings.family] || FAMILIES['Mariupol'];
+  ['weight', 'chorusWeight'].forEach(function (id) {
+    var sel = $(id); sel.innerHTML = '';
+    Object.keys(fam.weights).forEach(function (w) {
+      var o = document.createElement('option'); o.value = w;
+      o.textContent = w + ' — ' + WEIGHT_NAMES[w] + (fam.weights[w][3] ? ' (штучний)' : '');
+      sel.appendChild(o);
+    });
+  });
+  settings.weight = fontInfo(settings.weight).weight;
+  settings.chorusWeight = fontInfo(settings.chorusWeight).weight;
+  $('weight').value = settings.weight; $('chorusWeight').value = settings.chorusWeight;
+}
+function applySettingsToUI() {
+  $('overlay').value = settings.overlay; $('overlayVal').textContent = settings.overlay + '%';
+  $('family').value = settings.family; fillWeights();
+  $('photos').checked = settings.photos; $('sky').checked = settings.sky; $('titleSlide').checked = settings.titleSlide;
+}
+var saveTimer = null;
+function readSettingsFromUI(e) {
+  if (e && e.target && e.target.id === 'family' && settings.family !== $('family').value) {
+    settings.family = $('family').value;
+    var d = settings.family === 'Mariupol' ? [400, 700] : [500, 600];
+    settings.weight = d[0]; settings.chorusWeight = d[1];
+    fillWeights();
+  }
+  settings.overlay = +$('overlay').value; $('overlayVal').textContent = settings.overlay + '%';
+  settings.weight = +$('weight').value; settings.chorusWeight = +$('chorusWeight').value;
+  settings.photos = $('photos').checked; settings.sky = $('sky').checked; settings.titleSlide = $('titleSlide').checked;
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(function () { try { localStorage.setItem('settings', JSON.stringify(settings)); } catch (e) {} }, 300);
+  if (currentTab === 'batch') { clearTimeout(previewTimer); previewTimer = setTimeout(rebuildBatch, 500); }
+  else schedulePreview();
+}
+async function loadRecent() {
+  try {
+    var list = await server('listPresentations');
+    $('recent').innerHTML = list.length ? list.map(function (f) {
+      return '<a href="' + f.url + '" target="_blank">' + f.name.replace(/</g, '&lt;') +
+        '<br><small>' + new Date(f.date).toLocaleString('uk-UA') + '</small></a>';
+    }).join('') : '<div class="hint">Поки порожньо</div>';
+  } catch (e) {}
+}
+
+function setupKeyAndInstall() {
+  var m = location.hash.match(/key=([^&]+)/);               // посилання виду .../#key=XXXX
+  if (m) {
+    try { localStorage.setItem('apiKey', decodeURIComponent(m[1])); } catch (e) {}
+    history.replaceState(null, '', location.pathname + location.search);
+  }
+  window.addEventListener('hashchange', function () {        // посилання з ключем у вже відкритій вкладці
+    if (/key=/.test(location.hash)) location.reload();
+  });
+  $('keySave').addEventListener('click', function () {
+    var k = $('keyInput').value.trim();
+    if (!k) return;
+    try { localStorage.setItem('apiKey', k); } catch (e) {}
+    location.reload();
+  });
+  var ios = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  var standalone = window.navigator.standalone || matchMedia('(display-mode: standalone)').matches;
+  var dismissed = false;
+  try { dismissed = localStorage.getItem('installHint') === 'no'; } catch (e) {}
+  if (ios && !standalone && !dismissed) $('installHint').hidden = false;
+  $('installClose').addEventListener('click', function () {
+    $('installHint').hidden = true;
+    try { localStorage.setItem('installHint', 'no'); } catch (e) {}
+  });
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function () {});
+}
+
+(async function start() {
+  fillFamilies();
+  setupKeyAndInstall();
+  var saved = loadLocalSettings();
+  settings = Object.assign({}, DEFAULTS, saved);
+  if (!FAMILIES[settings.family]) settings.family = DEFAULTS.family;
+  applySettingsToUI();
+  if (!apiKey()) { $('keyBox').hidden = false; status('Потрібен ключ доступу'); return; }
+  try {
+    setup = await server('getSetup');
+    try { localStorage.setItem('setup', JSON.stringify(setup)); } catch (e) {}
+    var photoCount = Object.keys(setup.photos).reduce(function (n, c) { return n + setup.photos[c].length; }, 0);
+    status(photoCount ? 'Вставте текст пісні' : 'Вставте текст пісні (фото у папці «Фони» поки немає)');
+    loadRecent();
+  } catch (e) {
+    var msg = (e && e.message) || String(e);
+    if (/ключ/i.test(msg)) { $('keyBox').hidden = false; status('Невірний ключ доступу'); return; }
+    var cached = null;
+    try { cached = JSON.parse(localStorage.getItem('setup') || 'null'); } catch (e2) {}
+    if (!cached) { status('Не вдалося підключитися до Google Drive: ' + msg); return; }
+    setup = cached;                                           // офлайн: перегляд працює з кешу
+    status('Без інтернету: перегляд працює, зберегти можна буде пізніше');
+  }
+  prefetch();
+  ['family', 'overlay', 'weight', 'chorusWeight', 'photos', 'sky', 'titleSlide'].forEach(function (id) {
+    $(id).addEventListener('input', readSettingsFromUI);
+    $(id).addEventListener('change', readSettingsFromUI);
+  });
+  $('text').addEventListener('input', schedulePreview);
+  $('title').addEventListener('input', schedulePreview);
+  $('save').addEventListener('click', function () { if (currentTab === 'batch') saveBatch(); else save(); });
+  $('tabNewBtn').addEventListener('click', function () { switchTab('new'); });
+  $('tabBatchBtn').addEventListener('click', function () { switchTab('batch'); });
+  $('files').addEventListener('change', function () {
+    var files = Array.prototype.slice.call(this.files || []);
+    this.value = '';
+    if (files.length) addToBatch(files.map(function (f) {
+      return { name: f.name, load: function () { return f.arrayBuffer(); } };
+    }));
+  });
+  $('fromDrive').addEventListener('click', async function () {
+    if (batchBusy) return;
+    status('Шукаю файли в «Оригінали»…');
+    try {
+      var res = await server('listOriginals');
+      var known = {};
+      batch.forEach(function (i) { if (i.driveId) known[i.driveId] = 1; });
+      var files = res.files.filter(function (f) { return !known[f.id]; });
+      if (!files.length) { status('У папці «Оригінали» немає нових .pptx • <a href="' + res.url + '" target="_blank">відкрити папку</a>'); return; }
+      addToBatch(files.map(function (f) {
+        return { name: f.name, driveId: f.id, load: async function () {
+          var r = await server('getFileBase64', f.id);
+          return Uint8Array.from(atob(r.data), function (c) { return c.charCodeAt(0); }).buffer;
+        } };
+      }));
+    } catch (e) { status('Помилка: ' + ((e && e.message) || e)); }
+  });
+})();
+</script>
+</body>
+</html>
