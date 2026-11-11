@@ -3,7 +3,7 @@
  * Сторінка (index.html) береться з мережі, якщо вона є (щоб оновлення приходили одразу),
  * а без мережі — з кешу. Решта файлів — з кешу. Запити до Google (Apps Script) не кешуються.
  * Після змін у файлах збільшіть VERSION. */
-const VERSION = 'v3';
+const VERSION = 'v4';
 const CACHE = 'standartyzator-' + VERSION;
 const CORE = [
   './',
@@ -39,7 +39,7 @@ self.addEventListener('fetch', (event) => {
   if (isPage) {
     // мережа першою (свіжа версія), без мережі — кеш
     event.respondWith(
-      fetch(req)
+      fetch(req, { cache: 'no-store' })          // завжди свіжа версія сторінки, без кешу браузера
         .then((res) => {
           const copy = res.clone();
           caches.open(CACHE).then((c) => c.put('index.html', copy));
