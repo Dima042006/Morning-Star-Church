@@ -192,7 +192,7 @@ var lastBuild = null;
 var $ = function (id) { return document.getElementById(id); };
 
 /* ===================== ЗВ'ЯЗОК З GOOGLE DRIVE (Apps Script API) ===================== */
-var DEFAULT_API_URL = 'https://script.google.com/macros/s/AKfycbxjelvirQ4QwRidQXiZiUQjtxL_Ta66ETETgeXwoJIOte30cWDZot8FY9YGGwFbg2FSyg/exec';
+var DEFAULT_API_URL = 'https://script.google.com/macros/s/AKfycbyHPGCsWbZCiMpaxn32OP5cHgY7oBw4P6-HbGHv9PSSAVHF2x2TStb0_r9RlJJ2XOYz/exec';
 function apiUrl() {
   try { return localStorage.getItem('apiUrl') || DEFAULT_API_URL; } catch (e) { return DEFAULT_API_URL; }
 }
