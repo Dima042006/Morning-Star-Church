@@ -13,9 +13,14 @@ export function normalize(text) {
     .replace(/[́]/g, '')
     .replace(/[’'ʼ`´]/g, '')
     .replace(/ё/g, 'е')
+    // «12-ий», «12-го», «1-й» → 12, 1
+    .replace(/(\d)[-–]?(ий|ій|й|го|ого|му|ому|им|ім|ая|а|я|е|є|ої|у|ю)(?![а-яіїєґa-z0-9])/g, '$1')
     .replace(/(\d)\s*[-–—]\s*(\d)/g, '$1 по $2')     // «16-18» → «16 по 18»
     .replace(/(\d)\s*[:.,]\s*(\d)/g, '$1 $2')        // «3:16» → «3 16»
     .replace(/[^a-zа-яіїєґ0-9]+/gi, ' ')
+    // апостроф, який Chrome записав пробілом: «Филип ян», «Об явлення»
+    .replace(/(^| )(филип|філіп|філип|пилип) (ян)/g, '$1$2$3')
+    .replace(/(^| )об (явлен)/g, '$1об$2')
     .trim();
 }
 
@@ -103,8 +108,8 @@ export function findReferences(text, bible) {
     for (let steps = 0; j < tokens.length && steps < 8 && nums.length < 3; j++, steps++) {
       const t = tokens[j];
       if (t.num !== undefined) { nums.push({ n: t.num, marker: lastMarker, range: sawRange }); lastMarker = null; sawRange = false; continue; }
-      if (CHAPTER_WORD.test(t.word)) { if (nums.length && !nums[nums.length - 1].marker) nums[nums.length - 1].after = 'ch'; lastMarker = 'ch'; continue; }
-      if (VERSE_WORD.test(t.word)) { if (nums.length && !nums[nums.length - 1].marker) nums[nums.length - 1].after = 'v'; lastMarker = 'v'; continue; }
+      if (CHAPTER_WORD.test(t.word)) { if (nums.length && !nums[nums.length - 1].marker && !nums[nums.length - 1].after) nums[nums.length - 1].after = 'ch'; lastMarker = 'ch'; continue; }
+      if (VERSE_WORD.test(t.word)) { if (nums.length && !nums[nums.length - 1].marker && !nums[nums.length - 1].after) nums[nums.length - 1].after = 'v'; lastMarker = 'v'; continue; }
       if (RANGE_WORD.has(t.word) && nums.length) { sawRange = true; continue; }
       if (REF_FILLER.has(t.word)) continue;
       break;
@@ -115,7 +120,7 @@ export function findReferences(text, bible) {
       before.push({ n: tokens[i - 1].num });
       start = i - 1;
     }
-    const all = before.concat(nums);
+    const all = before.concat(mergeTens(nums));
     const ref = interpret(book, all, bible);
     if (!ref) continue;
     if (BOOKS[book].weak && ref.verse == null) continue;
@@ -125,6 +130,17 @@ export function findReferences(text, bible) {
     i = Math.max(i, j - 1);
   }
   return refs;
+}
+
+// Chrome інколи пише «двадцять два» як «20 2»: «Івана 20 2 1» → 22:1.
+// Зливаємо лише коли чисел три, без «розділ/вірш/по» — тоді третє число однозначно зайве.
+function mergeTens(nums) {
+  if (nums.length !== 3 || nums.some((x) => x.marker || x.after || x.range)) return nums;
+  const tens = (x) => x.n >= 20 && x.n <= 90 && x.n % 10 === 0;
+  const unit = (x) => x.n >= 1 && x.n <= 9;
+  if (tens(nums[0]) && unit(nums[1])) return [{ n: nums[0].n + nums[1].n }, nums[2]];
+  if (tens(nums[1]) && unit(nums[2])) return [nums[0], { n: nums[1].n + nums[2].n }];
+  return nums;
 }
 
 // «Йоіла 2:28» (синодальна/англ. нумерація) = «Йоіла 3:1» в Огієнка
@@ -167,7 +183,10 @@ function interpret(book, nums, bible) {
   const alt = ALT_NUMBERING[`${BOOKS[book].name} ${ch}`];
   if (alt && verse != null && verse >= alt.from) {
     const r = make(alt.ch, verse - alt.from + 1, verseEnd ? verseEnd - alt.from + 1 : null, 0.85);
-    if (r && !make(ch, verse, null, 1)) return r;
+    if (r && !make(ch, verse, null, 1)) {
+      r.label += ` (${ch}:${verse}${verseEnd ? '–' + verseEnd : ''})`;   // щоб було видно, звідки 3:1
+      return r;
+    }
   }
   let ref = make(ch, verse, verseEnd, verse == null ? 0.6 : 0.95);
   if (ref) return ref;
