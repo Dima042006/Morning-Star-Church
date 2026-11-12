@@ -7,9 +7,13 @@ import { makeSearch } from './lib/search.js';
 import { BOOKS } from './lib/books.js';
 
 const LIVE_KEY = 'bible-voice-live';
-const KEYS_KEY = 'bv-keys';
-const DEFAULT_KEYS = { start: 'PageDown', stop: 'PageUp', publish: 'Enter', clear: 'Escape', next: 'ArrowRight', prev: 'ArrowLeft' };
-const KEY_LABELS = { start: 'Почати слухати', stop: 'Завершити слухати', publish: 'Показати у LIVE', clear: 'Очистити LIVE', next: 'Наступний вірш', prev: 'Попередній вірш' };
+const KEYS_KEY = 'bv-keys2';   // v2: PageDown/PageUp тепер — вірші (як у презентера)
+const KEYS_CHANNEL = 'bible-voice-keys';
+const DEFAULT_KEYS = { next: 'PageDown', prev: 'PageUp', publish: 'Enter', clear: 'Period', start: 'KeyL', stop: 'KeyK' };
+// стрілки теж гортають вірші, якщо їх не призначено на інше
+const ARROWS = { ArrowRight: 'next', ArrowDown: 'next', ArrowLeft: 'prev', ArrowUp: 'prev' };
+const KEY_LABELS = { next: 'Наступний вірш', prev: 'Попередній вірш', publish: 'Показати у LIVE', clear: 'Очистити LIVE', start: 'Почати слухати', stop: 'Завершити слухати' };
+const keyName = (c) => ({ PageDown: 'PgDn', PageUp: 'PgUp', Period: '.', ArrowRight: '→', ArrowLeft: '←', Escape: 'Esc' }[c] || c.replace(/^Key|^Digit/, ''));
 
 const getStore = (key, fallback) => { try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; } };
 
@@ -116,11 +120,17 @@ export function Output() {
   const [full, setFull] = useState(!!document.fullscreenElement);
   useEffect(() => {
     const onFs = () => { setFull(!!document.fullscreenElement); setTimeout(fit, 50); };
-    const onKey = (e) => { if (e.code === 'KeyF') toggleFs(); };
+    // презентер натискає, коли активне вікно LIVE — передаємо клавіші панелі оператора
+    const keysBc = new BroadcastChannel(KEYS_CHANNEL);
+    const onKey = (e) => {
+      if (e.code === 'KeyF') { toggleFs(); return; }
+      if (e.repeat) return;
+      if (/^(Page|Arrow|Enter|Period|Space|Key|Digit|F\d)/.test(e.code) || e.code === 'Escape') { e.preventDefault(); keysBc.postMessage(e.code); }
+    };
     document.addEventListener('fullscreenchange', onFs);
     window.addEventListener('keydown', onKey);
     document.title = 'LIVE — Біблія';
-    return () => { document.removeEventListener('fullscreenchange', onFs); window.removeEventListener('keydown', onKey); };
+    return () => { keysBc.close(); document.removeEventListener('fullscreenchange', onFs); window.removeEventListener('keydown', onKey); };
   }, [fit]);
   const toggleFs = () => (document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen?.().catch(() => {}));
 
@@ -324,11 +334,19 @@ export default function App() {
         return;
       }
       if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName) || e.repeat) return;
-      const action = { [keys.start]: start, [keys.stop]: stop, [keys.publish]: () => publish(previewRef.current), [keys.clear]: clear, [keys.next]: () => step(1), [keys.prev]: () => step(-1) }[e.code];
-      if (action) { e.preventDefault(); action(); }
+      if (runKey(e.code)) e.preventDefault();
     };
+    const runKey = (code) => {
+      const acts = { start, stop, publish: () => publish(previewRef.current), clear, next: () => step(1), prev: () => step(-1) };
+      const name = Object.keys(keys).find((k) => keys[k] === code) || (!Object.values(keys).includes(code) && ARROWS[code]);
+      if (!name || !acts[name]) return false;
+      acts[name]();
+      return true;
+    };
+    const bc = new BroadcastChannel(KEYS_CHANNEL);
+    bc.onmessage = (e) => runKey(e.data);
     window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
+    return () => { bc.close(); window.removeEventListener('keydown', handler); };
   });
 
   const total = bible ? bible.books.reduce((n, b) => n + b.chapters.reduce((m, c) => m + c.length, 0), 0) : 0;
@@ -367,8 +385,8 @@ export default function App() {
                   <div><strong>{listening ? 'Слухаю проповідь' : 'Готовий до вашого голосу'}</strong>
                     <p>{transcript ? `…${transcript.slice(-160)}` : '«Івана три шістнадцять», «Римлян, восьмий розділ, двадцять восьмий вірш»'}</p></div></div>
                 <div className="two-buttons">
-                  <button className="primary" disabled={listening || !bible} onClick={start}>● Почати слухати <kbd>{keys.start}</kbd></button>
-                  <button className="dark" disabled={!listening} onClick={stop}>■ Завершити <kbd>{keys.stop}</kbd></button>
+                  <button className="primary" disabled={listening || !bible} onClick={start}>● Почати слухати <kbd>{keyName(keys.start)}</kbd></button>
+                  <button className="dark" disabled={!listening} onClick={stop}>■ Завершити <kbd>{keyName(keys.stop)}</kbd></button>
                 </div>
                 <div className="divider-label">АБО ВВЕДІТЬ ВРУЧНУ</div>
                 <form onSubmit={(e) => { e.preventDefault(); runSearch(query); }} className="search-form">
@@ -396,17 +414,17 @@ export default function App() {
                     : <div className="verse-placeholder">Оберіть вірш із результатів, щоб побачити його тут.</div>}
                   <div className="verse-card-bottom">ПЕРЕКЛАД ОГІЄНКА <span>✦</span></div>
                 </div>
-                <button className="publish" disabled={!preview} onClick={() => publish(preview)}>ПОКАЗАТИ У LIVE <span>↗ {keys.publish}</span></button>
+                <button className="publish" disabled={!preview} onClick={() => publish(preview)}>ПОКАЗАТИ У LIVE <span>↗ {keyName(keys.publish)}</span></button>
                 <div className="live-section">
                   <div className="panel-head"><div><span className="step">04 / ТРАНСЛЯЦІЯ</span><h2>Зараз в ефірі</h2></div><span className="live-dot">● LIVE</span></div>
                   <div className="live-card">{live ? <><strong>{live.label}</strong><p>{live.text}</p></> : <span>На екрані поки немає вірша</span>}</div>
                   <div className="step-buttons">
-                    <button className="dark" disabled={!live && !preview} onClick={() => step(-1)}>◀ Попередній вірш <kbd>{keys.prev}</kbd></button>
-                    <button className="dark" disabled={!live && !preview} onClick={() => step(1)}>Наступний вірш ▶ <kbd>{keys.next}</kbd></button>
+                    <button className="dark" disabled={!live && !preview} onClick={() => step(-1)}>◀ Попередній вірш <kbd>{keyName(keys.prev)}</kbd></button>
+                    <button className="dark" disabled={!live && !preview} onClick={() => step(1)}>Наступний вірш ▶ <kbd>{keyName(keys.next)}</kbd></button>
                   </div>
                   <div className="live-controls">
                     <button className="outline" onClick={openLive}>▣ Вивести на проєктор</button>
-                    <button className="outline" onClick={clear}>Очистити LIVE <kbd>{keys.clear}</kbd></button>
+                    <button className="outline" onClick={clear}>Очистити LIVE <kbd>{keyName(keys.clear)}</kbd></button>
                   </div>
                 </div>
               </section>
@@ -416,9 +434,9 @@ export default function App() {
               <section className="panel"><span className="step">01 / ПУЛЬТ</span><h2>Кнопки</h2>
                 <p className="settings-copy">Натисніть «Призначити», потім потрібну кнопку на пульті чи клавіатурі.</p>
                 {Object.keys(KEY_LABELS).map((k) => (
-                  <div className="key-line" key={k}><div><b>{KEY_LABELS[k]}</b><small>{keys[k]}</small></div>
+                  <div className="key-line" key={k}><div><b>{KEY_LABELS[k]}</b><small>{keyName(keys[k])}</small></div>
                     <button className="outline" onClick={() => setCapture(k)}>{capture === k ? 'Натисніть кнопку…' : 'Призначити'}</button></div>))}
-                <p className="hint">Кнопки працюють, коли активне вікно оператора і курсор не в полі введення.</p>
+                <p className="hint">Презентер: «вперед/назад» = PgDn/PgUp — гортають вірші; кнопка «чорний екран» (.) — очищає LIVE. Працює і коли активне вікно LIVE на проєкторі. Стрілки ← → теж гортають. Кнопки не спрацьовують, поки курсор у полі введення.</p>
               </section>
               <section className="panel"><span className="step">02 / ПРОЄКТОР</span><h2>Екран для LIVE</h2>
                 <p className="settings-copy">Chrome спитає дозвіл «Керувати вікнами на всіх екранах» — дозвольте. Тоді кнопка «На проєктор» сама відкриває вірш на другому екрані.</p>
