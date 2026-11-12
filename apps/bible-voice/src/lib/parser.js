@@ -124,6 +124,8 @@ export function findReferences(text, bible) {
     const ref = interpret(book, all, bible);
     if (!ref) continue;
     if (BOOKS[book].weak && ref.verse == null) continue;
+    // «Тимофію 3 16» без «перше/друге» — вгадали 1-шу книгу; ШІ може уточнити
+    if (hit.numbered && hit.numbered !== 'john' && !numberBefore(tokens, i)) { ref.guessed = true; ref.confidence = Math.min(ref.confidence, 0.7); }
     ref.from = tokens[start].from;
     ref.to = tokens[Math.max(i + hit.len - 1, j - 1)].to;
     refs.push(ref);
@@ -208,4 +210,15 @@ function interpret(book, nums, bible) {
     }
   }
   return make(ch, null, null, 0.5);
+}
+
+/** Чи є в тексті назва книги Біблії (навіть без чисел) — тоді є сенс спитати ШІ. */
+export function mentionsBook(text) {
+  const words = normalize(text).split(' ').filter(Boolean);
+  const tw = foldNumbers(words).map((t) => t.word);
+  for (let i = 0; i < tw.length; i++) {
+    const hit = bookAt(tw, i);
+    if (hit && !(hit.book != null && BOOKS[hit.book].weak)) return true;
+  }
+  return /(розділ|вірш)/.test(words.join(' '));
 }

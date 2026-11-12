@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import StarMark from './StarMark.jsx';
 import { loadBible } from './lib/bible.js';
-import { findReferences, normalize } from './lib/parser.js';
+import { findReferences, normalize, mentionsBook } from './lib/parser.js';
+import { askAI, aiConfig, setAiKey, setAiEnabled, readKeyFromHash } from './lib/ai.js';
 import { makeSearch } from './lib/search.js';
 import { BOOKS } from './lib/books.js';
 
@@ -15,8 +16,9 @@ const getStore = (key, fallback) => { try { return JSON.parse(localStorage.getIt
 /** Повний запис для показу: посилання + текст. */
 function toVerse(bible, r, confidence = r.confidence ?? 1) {
   const name = BOOKS[r.book].name;
-  const label = `${name === 'Псалми' ? 'Псалом' : name} ${r.chapter}:${r.verse ?? 1}${r.verseEnd ? '–' + r.verseEnd : ''}`;
-  return { label, book: r.book, chapter: r.chapter, verse: r.verse ?? 1, verseEnd: r.verseEnd || null,
+  const label = r.verse != null && r.label ? r.label :
+    `${name === 'Псалми' ? 'Псалом' : name} ${r.chapter}:${r.verse ?? 1}${r.verseEnd ? '–' + r.verseEnd : ''}`;
+  return { label, ai: !!r.ai, book: r.book, chapter: r.chapter, verse: r.verse ?? 1, verseEnd: r.verseEnd || null,
     text: bible.text(r.book, r.chapter, r.verse ?? 1, r.verseEnd), confidence, chapterOnly: r.verse == null };
 }
 
@@ -97,6 +99,10 @@ export default function App() {
   const finalText = useRef('');
   const seen = useRef(new Map());
   const channel = useRef(null);
+  const [ai, setAi] = useState(() => { readKeyFromHash(); return aiConfig(); });
+  const [aiState, setAiState] = useState('');          // '', 'думає', текст помилки
+  const aiBusy = useRef(false), aiPending = useRef(false), aiRef = useRef(ai);
+  aiRef.current = ai;
   const previewRef = useRef(null);
   previewRef.current = preview;
 
@@ -125,6 +131,21 @@ export default function App() {
     setStatus(`Почуто: ${verses.map((v) => v.label).join(', ')}`);
   }, [bible]);
 
+  /** Один запит до ШІ за раз; якщо поки чекали прийшов новий текст — ще один після. */
+  const runAI = useCallback(async (text) => {
+    const cfg = aiRef.current;
+    if (!cfg.enabled || !cfg.key || !bible) return;
+    if (aiBusy.current) { aiPending.current = text; return; }
+    aiBusy.current = true; setAiState('думає');
+    try {
+      const refs = await askAI(text, bible);
+      setAiState('');
+      if (refs.length) addDetected(refs);
+    } catch (e) { setAiState(e.message); }
+    aiBusy.current = false;
+    if (aiPending.current) { const t = aiPending.current; aiPending.current = false; runAI(t); }
+  }, [bible, addDetected]);
+
   const runSearch = (text) => {
     if (!bible) return;
     const q = text.trim();
@@ -132,6 +153,15 @@ export default function App() {
     const manual = manualReference(q, bible);
     const refs = manual ? [manual] : findReferences(q, bible);
     let list = refs.map((r) => toVerse(bible, r));
+    if (!list.length && ai.enabled && ai.key && mentionsBook(q)) {   // «як Павло писав Тимофію в третьому…»
+      setStatus('Питаю ШІ…');
+      askAI(q, bible).then((refs) => {
+        const l = refs.map((r) => toVerse(bible, r));
+        if (!l.length) { setStatus('ШІ теж не знайшов посилання'); return; }
+        setResults(l); setPreview(l[0]); setStatus(`ШІ знайшов: ${l.map((v) => v.label).join(', ')}`);
+      }).catch((e) => setStatus('ШІ: ' + e.message));
+      return;
+    }
     if (!list.length) list = searchRef.current(q).map((r) => toVerse(bible, r, r.confidence));
     setResults(list);
     setPreview(list[0] || null);
@@ -160,16 +190,23 @@ export default function App() {
       r.continuous = true;
       r.interimResults = true;
       r.onresult = (e) => {
-        let interim = '';
+        let interim = '', newFinal = '', hasFinal = false;
         for (let i = e.resultIndex; i < e.results.length; i++) {
           const t = e.results[i][0].transcript;
-          if (e.results[i].isFinal) finalText.current += t + ' ';
+          if (e.results[i].isFinal) { finalText.current += t + ' '; newFinal += t + ' '; hasFinal = true; }
           else interim += t;
         }
+        // попереднє речення теж — назва книги могла бути там, а числа тут
+        newFinal = finalText.current.slice(-(newFinal.length + 80));
         finalText.current = finalText.current.slice(-1500);
         const all = (finalText.current + interim).trim();
         setTranscript(all.slice(-400));
-        addDetected(findReferences(finalText.current.slice(-300), bible));   // лише остаточно розпізнаний текст
+        if (!hasFinal) return;
+        const refs = findReferences(finalText.current.slice(-300), bible);   // лише остаточно розпізнаний текст
+        addDetected(refs);
+        // ШІ підстраховує: назвали книгу, а ми нічого не знайшли або вгадували «1/2 Тимофія»
+        const tail = finalText.current.slice(-220);
+        if (refs.some((r) => r.guessed) || (!findReferences(newFinal, bible).length && mentionsBook(newFinal))) runAI(tail);
       };
       r.onerror = (e) => {
         if (e.error === 'no-speech' || e.error === 'aborted') return;
@@ -263,13 +300,13 @@ export default function App() {
                   <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="ів 3 16 · 1 кор 13 4 · пс 23 · або слова з вірша" />
                   <button type="submit" disabled={!bible}>Знайти ↗</button>
                 </form>
-                <div className="status">↗ {status}</div>
+                <div className="status">↗ {status}{ai.enabled && ai.key ? <span className="ai-state"> · ШІ {aiState === 'думає' ? 'думає…' : aiState ? '— ' + aiState : 'на підхваті'}</span> : null}</div>
                 <div className="panel-head result-head"><div><span className="step">02 / РЕЗУЛЬТАТИ</span><h2>Знайдені вірші</h2></div>
                   <span className="count">{results.length.toString().padStart(2, '0')}</span></div>
                 <div className="results">
                   {results.length ? results.map((v, i) => (
                     <button className={'result ' + (preview && preview.label === v.label ? 'selected' : '')} key={v.label + i} onClick={() => setPreview(v)}>
-                      <div className="result-top"><strong>{v.label}</strong><span>{v.confidence >= 0.9 ? 'точно' : Math.round(v.confidence * 100) + '% збіг'}</span></div>
+                      <div className="result-top"><strong>{v.label}</strong><span>{v.ai ? '✦ ШІ' : v.confidence >= 0.9 ? 'точно' : Math.round(v.confidence * 100) + '% збіг'}</span></div>
                       <p>{v.text}</p>
                     </button>)) :
                     <div className="empty-results">Результати з’являться тут.<br /><small>Біблія Огієнка: {total.toLocaleString('uk-UA')} віршів.</small></div>}
@@ -304,7 +341,23 @@ export default function App() {
                     <button className="outline" onClick={() => setCapture(k)}>{capture === k ? 'Натисніть кнопку…' : 'Призначити'}</button></div>))}
                 <p className="hint">Кнопки працюють, коли активне вікно оператора і курсор не в полі введення.</p>
               </section>
-              <section className="panel"><span className="step">02 / БІБЛІЯ</span><h2>Текст для пошуку</h2>
+              <section className="panel"><span className="step">02 / ШІ</span><h2>Помічник Gemini</h2>
+                <p className="settings-copy">Коли проповідник називає книгу, а програма не розібрала числа, або каже «Тимофію» без «перше/друге», — останні речення йдуть у Gemini, і він підказує вірш. Позначка «✦ ШІ» у результатах.</p>
+                <label className="key-line"><div><b>Використовувати ШІ</b><small>{ai.key ? 'ключ доступу є' : 'потрібен ключ доступу'}</small></div>
+                  <input type="checkbox" checked={ai.enabled} onChange={(e) => { setAiEnabled(e.target.checked); setAi(aiConfig()); }} /></label>
+                <form className="search-form" onSubmit={(e) => { e.preventDefault(); setAiKey(e.target.k.value); setAi(aiConfig()); e.target.k.value = ''; }}>
+                  <input name="k" placeholder={ai.key ? 'Ключ збережено. Новий ключ…' : 'Ключ доступу (той самий, що у Стандартизаторі)'} />
+                  <button type="submit">Зберегти</button>
+                </form>
+                <button className="outline" disabled={!ai.key || !bible} onClick={() => {
+                  setAiState('думає');
+                  askAI('як писав апостол Павло Тимофію в третьому розділі, шістнадцятий вірш', bible)
+                    .then((r) => setAiState(r.length ? 'працює: ' + r.map((x) => toVerse(bible, x).label).join(', ') : 'відповів, але нічого не знайшов'))
+                    .catch((e) => setAiState(e.message));
+                }}>Перевірити ШІ</button>
+                {aiState && aiState !== 'думає' ? <p className="hint">{aiState}</p> : aiState ? <p className="hint">Чекаю відповідь…</p> : null}
+              </section>
+              <section className="panel"><span className="step">03 / БІБЛІЯ</span><h2>Текст для пошуку</h2>
                 <p className="settings-copy">Вбудовано повний переклад Івана Огієнка (суспільне надбання). Нумерація псалмів — як у виданнях Огієнка: «Господь — то мій Пастир» = Псалом 23.</p>
                 <div className="db-number">{total.toLocaleString('uk-UA')} <span>віршів у базі</span></div>
                 <div className="format"><b>Як відкрити екран для проєктора</b>
