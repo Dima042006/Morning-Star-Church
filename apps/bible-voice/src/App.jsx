@@ -40,6 +40,36 @@ function manualReference(input, bible) {
   return { book, chapter, verse, verseEnd, confidence: 1 };
 }
 
+/* ======================= ПРОЄКТОР (другий екран) ======================= */
+const SCREEN_KEY = 'bv-screen';
+const screenName = (s, i) => `${s.label || 'Екран ' + (i + 1)} — ${s.width}×${s.height}${s.isPrimary ? ' (основний)' : ''}`;
+
+/** Список екранів (Chrome: дозвіл «Керування вікнами»). null — браузер не вміє. */
+async function getScreens() {
+  if (!('getScreenDetails' in window)) return null;
+  const d = await window.getScreenDetails();
+  return { screens: d.screens, current: d.currentScreen };
+}
+
+/** Відкриває вікно LIVE на весь вибраний екран (за замовчуванням — не той, де оператор). */
+async function openOnProjector() {
+  let info = null;
+  try { info = await getScreens(); } catch { info = null; }
+  if (!info || info.screens.length < 2) {
+    window.open('?output=1', 'biblevoice_output', 'popup,width=1280,height=720');
+    return info ? 'Другий екран не знайдено. Підключіть проєктор (режим «Розширити», не «Дублювати») і натисніть ще раз.'
+      : 'Браузер не бачить екранів — перетягніть вікно LIVE на проєктор і двічі клацніть по ньому.';
+  }
+  const saved = localStorage.getItem(SCREEN_KEY);
+  const target = info.screens.find((s, i) => screenName(s, i) === saved && s !== info.current)
+    || info.screens.find((s) => s !== info.current && !s.isPrimary)
+    || info.screens.find((s) => s !== info.current);
+  const w = window.open('?output=1&fs=1', 'biblevoice_output',
+    `popup,fullscreen,left=${target.left},top=${target.top},width=${target.width},height=${target.height}`);
+  if (!w) return 'Chrome заблокував вікно — дозвольте спливаючі вікна для цього сайту.';
+  return `LIVE відкрито на «${target.label || 'другому екрані'}». Якщо видно рамку вікна — двічі клацніть по ньому.`;
+}
+
 /* ======================= ВІКНО LIVE (для проєктора / OBS) ======================= */
 export function Output() {
   const [live, setLive] = useState(() => getStore(LIVE_KEY, null));
@@ -68,8 +98,21 @@ export function Output() {
   useEffect(() => { fit(); }, [live, fit]);
   useEffect(() => { window.addEventListener('resize', fit); return () => window.removeEventListener('resize', fit); }, [fit]);
 
+  // підказка, поки вікно не на весь екран; F / подвійний клік — повний екран
+  const [full, setFull] = useState(!!document.fullscreenElement);
+  useEffect(() => {
+    const onFs = () => { setFull(!!document.fullscreenElement); setTimeout(fit, 50); };
+    const onKey = (e) => { if (e.code === 'KeyF') toggleFs(); };
+    document.addEventListener('fullscreenchange', onFs);
+    window.addEventListener('keydown', onKey);
+    document.title = 'LIVE — Біблія';
+    return () => { document.removeEventListener('fullscreenchange', onFs); window.removeEventListener('keydown', onKey); };
+  }, [fit]);
+  const toggleFs = () => (document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen?.().catch(() => {}));
+
   return (
-    <div className="screen" onDoubleClick={() => document.documentElement.requestFullscreen?.()}>
+    <div className="screen" onDoubleClick={toggleFs}>
+      {!full ? <div className="screen-hint">Двічі клацніть (або F) — на весь екран</div> : null}
       {live ? (
         <div className="screen-inner" ref={boxRef}>
           <div className="screen-text" ref={textRef}>{live.text}</div>
@@ -237,7 +280,13 @@ export default function App() {
     channel.current?.postMessage(null);
     setStatus('LIVE очищено');
   };
-  const openLive = () => window.open('?output=1', 'biblevoice_output', 'width=1280,height=720');
+  const openLive = async () => setStatus(await openOnProjector());
+  const [screens, setScreens] = useState(null);
+  const [screenSel, setScreenSel] = useState(() => localStorage.getItem(SCREEN_KEY) || '');
+  const loadScreens = async () => {
+    try { const i = await getScreens(); setScreens(i ? i.screens.map(screenName) : []); }
+    catch { setScreens([]); }
+  };
 
   // гарячі клавіші / пульт
   useEffect(() => {
@@ -273,7 +322,7 @@ export default function App() {
         <header className="topbar">
           <span>ПАНЕЛЬ ОПЕРАТОРА <b>/ {tab === 'search' ? 'ПОШУК' : 'НАЛАШТУВАННЯ'}</b></span>
           <div className="top-actions"><span className="top-dot" /> {bible ? 'Біблія завантажена' : 'Завантаження…'}
-            <button className="outline small" onClick={openLive}>↗ Відкрити LIVE</button></div>
+            <button className="outline small" onClick={openLive}>▣ На проєктор</button></div>
         </header>
 
         <div className="content">
@@ -326,7 +375,7 @@ export default function App() {
                   <div className="panel-head"><div><span className="step">04 / ТРАНСЛЯЦІЯ</span><h2>Зараз в ефірі</h2></div><span className="live-dot">● LIVE</span></div>
                   <div className="live-card">{live ? <><strong>{live.label}</strong><p>{live.text}</p></> : <span>На екрані поки немає вірша</span>}</div>
                   <div className="live-controls">
-                    <button className="outline" onClick={openLive}>↗ Вікно для проєктора / OBS</button>
+                    <button className="outline" onClick={openLive}>▣ Вивести на проєктор</button>
                     <button className="outline" onClick={clear}>Очистити LIVE <kbd>{keys.clear}</kbd></button>
                   </div>
                 </div>
@@ -341,7 +390,16 @@ export default function App() {
                     <button className="outline" onClick={() => setCapture(k)}>{capture === k ? 'Натисніть кнопку…' : 'Призначити'}</button></div>))}
                 <p className="hint">Кнопки працюють, коли активне вікно оператора і курсор не в полі введення.</p>
               </section>
-              <section className="panel"><span className="step">02 / ШІ</span><h2>Помічник Gemini</h2>
+              <section className="panel"><span className="step">02 / ПРОЄКТОР</span><h2>Екран для LIVE</h2>
+                <p className="settings-copy">Chrome спитає дозвіл «Керувати вікнами на всіх екранах» — дозвольте. Тоді кнопка «На проєктор» сама відкриває вірш на другому екрані.</p>
+                <button className="outline" onClick={loadScreens}>Знайти екрани</button>
+                {screens && !screens.length ? <p className="hint">Браузер не дав список екранів. Перевірте, що це Chrome і проєктор підключено в режимі «Розширити».</p> : null}
+                {screens && screens.length ? screens.map((n) => (
+                  <label className="key-line" key={n}><div><b>{n}</b></div>
+                    <input type="radio" name="scr" checked={screenSel ? screenSel === n : !n.endsWith('(основний)')} onChange={() => { setScreenSel(n); localStorage.setItem(SCREEN_KEY, n); }} /></label>)) : null}
+                <button className="publish" onClick={openLive}>ВИВЕСТИ НА ПРОЄКТОР <span>▣</span></button>
+              </section>
+              <section className="panel"><span className="step">03 / ШІ</span><h2>Помічник Gemini</h2>
                 <p className="settings-copy">Коли проповідник називає книгу, а програма не розібрала числа, або каже «Тимофію» без «перше/друге», — останні речення йдуть у Gemini, і він підказує вірш. Позначка «✦ ШІ» у результатах.</p>
                 <label className="key-line"><div><b>Використовувати ШІ</b><small>{ai.key ? 'ключ доступу є' : 'потрібен ключ доступу'}</small></div>
                   <input type="checkbox" checked={ai.enabled} onChange={(e) => { setAiEnabled(e.target.checked); setAi(aiConfig()); }} /></label>
@@ -357,11 +415,11 @@ export default function App() {
                 }}>Перевірити ШІ</button>
                 {aiState && aiState !== 'думає' ? <p className="hint">{aiState}</p> : aiState ? <p className="hint">Чекаю відповідь…</p> : null}
               </section>
-              <section className="panel"><span className="step">03 / БІБЛІЯ</span><h2>Текст для пошуку</h2>
+              <section className="panel"><span className="step">04 / БІБЛІЯ</span><h2>Текст для пошуку</h2>
                 <p className="settings-copy">Вбудовано повний переклад Івана Огієнка (суспільне надбання). Нумерація псалмів — як у виданнях Огієнка: «Господь — то мій Пастир» = Псалом 23.</p>
                 <div className="db-number">{total.toLocaleString('uk-UA')} <span>віршів у базі</span></div>
                 <div className="format"><b>Як відкрити екран для проєктора</b>
-                  <code>«Відкрити LIVE» → перетягніть вікно на проєктор → подвійний клік = на весь екран</code></div>
+                  <code>Проєктор у режимі «Розширити» → «На проєктор» → вікно саме стане на другий екран. Рамка? Подвійний клік або F</code></div>
               </section>
             </div>
           )}
