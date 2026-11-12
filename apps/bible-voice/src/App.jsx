@@ -8,8 +8,8 @@ import { BOOKS } from './lib/books.js';
 
 const LIVE_KEY = 'bible-voice-live';
 const KEYS_KEY = 'bv-keys';
-const DEFAULT_KEYS = { start: 'PageDown', stop: 'PageUp', publish: 'Enter', clear: 'Escape' };
-const KEY_LABELS = { start: 'Почати слухати', stop: 'Завершити слухати', publish: 'Показати у LIVE', clear: 'Очистити LIVE' };
+const DEFAULT_KEYS = { start: 'PageDown', stop: 'PageUp', publish: 'Enter', clear: 'Escape', next: 'ArrowRight', prev: 'ArrowLeft' };
+const KEY_LABELS = { start: 'Почати слухати', stop: 'Завершити слухати', publish: 'Показати у LIVE', clear: 'Очистити LIVE', next: 'Наступний вірш', prev: 'Попередній вірш' };
 
 const getStore = (key, fallback) => { try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; } };
 
@@ -20,6 +20,20 @@ function toVerse(bible, r, confidence = r.confidence ?? 1) {
     `${name === 'Псалми' ? 'Псалом' : name} ${r.chapter}:${r.verse ?? 1}${r.verseEnd ? '–' + r.verseEnd : ''}`;
   return { label, ai: !!r.ai, book: r.book, chapter: r.chapter, verse: r.verse ?? 1, verseEnd: r.verseEnd || null,
     text: bible.text(r.book, r.chapter, r.verse ?? 1, r.verseEnd), confidence, chapterOnly: r.verse == null };
+}
+
+/** Сусідній вірш: dir = 1 / -1. Переходить через межу розділу; діапазон 12:1–2 → далі 12:3. */
+function stepVerse(bible, v, dir) {
+  let { book, chapter } = v;
+  let verse = dir > 0 ? (v.verseEnd || v.verse) + 1 : v.verse - 1;
+  if (verse > bible.verseCount(book, chapter)) {
+    if (chapter >= bible.chapterCount(book)) return null;
+    chapter += 1; verse = 1;
+  } else if (verse < 1) {
+    if (chapter <= 1) return null;
+    chapter -= 1; verse = bible.verseCount(book, chapter);
+  }
+  return toVerse(bible, { book, chapter, verse, confidence: 1 });
 }
 
 /** Ручне введення зі скороченнями: «ів 3 16», «1 кор 13:4», «пс 23». */
@@ -148,6 +162,8 @@ export default function App() {
   aiRef.current = ai;
   const previewRef = useRef(null);
   previewRef.current = preview;
+  const liveRef = useRef(null);
+  liveRef.current = live;
 
   useEffect(() => {
     channel.current = new BroadcastChannel(LIVE_KEY);
@@ -280,6 +296,16 @@ export default function App() {
     channel.current?.postMessage(null);
     setStatus('LIVE очищено');
   };
+  // ◀ ▶ — якщо щось в ефірі, гортаємо LIVE; інакше — попередній перегляд
+  const step = (dir) => {
+    if (!bible) return;
+    const cur = liveRef.current || previewRef.current;
+    if (!cur) return;
+    const n = stepVerse(bible, cur, dir);
+    if (!n) { setStatus(dir > 0 ? 'Це останній вірш книги' : 'Це перший вірш книги'); return; }
+    setPreview(n);
+    if (liveRef.current) publish(n);
+  };
   const openLive = async () => setStatus(await openOnProjector());
   const [screens, setScreens] = useState(null);
   const [screenSel, setScreenSel] = useState(() => localStorage.getItem(SCREEN_KEY) || '');
@@ -298,7 +324,7 @@ export default function App() {
         return;
       }
       if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName) || e.repeat) return;
-      const action = { [keys.start]: start, [keys.stop]: stop, [keys.publish]: () => publish(previewRef.current), [keys.clear]: clear }[e.code];
+      const action = { [keys.start]: start, [keys.stop]: stop, [keys.publish]: () => publish(previewRef.current), [keys.clear]: clear, [keys.next]: () => step(1), [keys.prev]: () => step(-1) }[e.code];
       if (action) { e.preventDefault(); action(); }
     };
     window.addEventListener('keydown', handler);
@@ -374,6 +400,10 @@ export default function App() {
                 <div className="live-section">
                   <div className="panel-head"><div><span className="step">04 / ТРАНСЛЯЦІЯ</span><h2>Зараз в ефірі</h2></div><span className="live-dot">● LIVE</span></div>
                   <div className="live-card">{live ? <><strong>{live.label}</strong><p>{live.text}</p></> : <span>На екрані поки немає вірша</span>}</div>
+                  <div className="step-buttons">
+                    <button className="dark" disabled={!live && !preview} onClick={() => step(-1)}>◀ Попередній вірш <kbd>{keys.prev}</kbd></button>
+                    <button className="dark" disabled={!live && !preview} onClick={() => step(1)}>Наступний вірш ▶ <kbd>{keys.next}</kbd></button>
+                  </div>
                   <div className="live-controls">
                     <button className="outline" onClick={openLive}>▣ Вивести на проєктор</button>
                     <button className="outline" onClick={clear}>Очистити LIVE <kbd>{keys.clear}</kbd></button>

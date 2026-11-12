@@ -9,3 +9,4 @@
 .screen-ref { position: absolute; right: 0; bottom: 0; font-family: 'Mariupol', 'Onest', sans-serif; font-size: clamp(14px, 3vh, 40px); color: rgba(255,255,255,.7); letter-spacing: .02em; }
 .ai-state{color:#8a7f73}
 .screen-hint { position: absolute; top: 16px; left: 50%; transform: translateX(-50%); font: 14px 'Onest', sans-serif; color: rgba(255,255,255,.55); border: 1px solid rgba(255,255,255,.25); padding: 6px 12px; pointer-events: none; }
+.step-buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
