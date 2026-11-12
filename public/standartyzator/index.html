@@ -7,75 +7,121 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" href="icon-192.png">
-<meta name="theme-color" content="#0e0f13">
+<meta name="theme-color" content="#312a22">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Стандартизатор">
 <script defer src="pptxgen.bundle.js"></script>
 <style>
-  :root { --bg:#0e0f13; --card:#181a21; --line:#2a2d37; --text:#f2f3f5; --muted:#9aa0ab; --accent:#e9a15a; }
-  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-  html,body { margin:0; background:var(--bg); color:var(--text);
-    font:16px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-  main { max-width:640px; margin:0 auto; padding:calc(16px + env(safe-area-inset-top)) 16px 120px; }
-  h1 { font-size:22px; margin:8px 0 2px; }
-  .sub { color:var(--muted); font-size:14px; margin-bottom:16px; }
-  label.f { display:block; font-size:13px; color:var(--muted); margin:14px 0 6px; }
-  input[type=text], textarea, select { font:inherit; width:100%; background:var(--card); color:var(--text);
-    border:1px solid var(--line); border-radius:12px; padding:12px; font-size:16px; }
-  textarea { min-height:240px; resize:vertical; line-height:1.45; }
-  details { background:var(--card); border:1px solid var(--line); border-radius:12px; margin-top:14px; }
-  summary { padding:12px 14px; cursor:pointer; font-weight:600; }
-  .opts { padding:4px 14px 14px; }
-  .row { display:flex; align-items:center; gap:10px; margin:10px 0; }
-  .row > span:first-child { flex:1; }
-  input[type=range] { flex:1.4; accent-color:var(--accent); }
-  input[type=checkbox] { width:22px; height:22px; accent-color:var(--accent); }
-  select { width:auto; padding:8px 10px; }
-  .hint { color:var(--muted); font-size:13px; margin-top:6px; }
-  .slides { display:grid; gap:10px; margin-top:16px; }
-  .slides canvas { width:100%; border-radius:8px; display:block; background:#000; }
-  .bar { position:fixed; left:0; right:0; bottom:0; padding:12px 16px calc(12px + env(safe-area-inset-bottom));
-    background:rgba(14,15,19,.94); backdrop-filter:blur(8px); border-top:1px solid var(--line); }
-  .bar .in { max-width:640px; margin:0 auto; }
-  button.main { width:100%; padding:15px; border:0; border-radius:14px; background:var(--accent);
-    color:#1a1206; font-size:17px; font-weight:700; }
-  button.main:disabled { opacity:.45; }
-  .status { font-size:14px; color:var(--muted); margin-top:8px; min-height:1.2em; text-align:center; }
-  .status a { color:var(--accent); }
-  .recent a { color:var(--text); text-decoration:none; display:block; padding:8px 0; border-bottom:1px solid var(--line); font-size:15px; }
-  .recent small { color:var(--muted); }
-  .tabs { display:flex; background:var(--card); border:1px solid var(--line); border-radius:12px; padding:4px; gap:4px; margin-bottom:6px; }
-  .tabs button { flex:1; padding:10px; border:0; border-radius:9px; background:transparent; color:var(--muted); font:inherit; font-weight:600; }
-  .tabs button.on { background:var(--accent); color:#1a1206; }
-  .btn { display:block; width:100%; text-align:center; padding:13px; margin-top:10px; border:1px solid var(--line);
-    border-radius:12px; background:var(--card); color:var(--text); font:inherit; font-weight:600; cursor:pointer; }
-  .file { background:var(--card); border:1px solid var(--line); border-radius:12px; margin-top:10px; }
-  .file summary { font-weight:600; }
-  .file .meta { color:var(--muted); font-size:13px; font-weight:400; }
-  .file .slides { padding:0 10px 10px; margin-top:0; }
-  [hidden] { display:none !important; }
-  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px; margin:10px 0; }
-  .card b { display:block; margin-bottom:6px; }
-  .card .btn { margin-top:10px; }
-  .install { font-size:14px; color:var(--text); }
+@font-face{font-family:'Onest';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/ui/onest-cyrillic-400-normal.woff2) format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:'Onest';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/ui/onest-latin-400-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Onest';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/ui/onest-cyrillic-500-normal.woff2) format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:'Onest';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/ui/onest-latin-500-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Onest';font-style:normal;font-weight:600;font-display:swap;src:url(fonts/ui/onest-cyrillic-600-normal.woff2) format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:'Onest';font-style:normal;font-weight:600;font-display:swap;src:url(fonts/ui/onest-latin-600-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Onest';font-style:normal;font-weight:700;font-display:swap;src:url(fonts/ui/onest-cyrillic-700-normal.woff2) format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:'Onest';font-style:normal;font-weight:700;font-display:swap;src:url(fonts/ui/onest-latin-700-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Oswald';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/ui/oswald-cyrillic-500-normal.woff2) format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:'Oswald';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/ui/oswald-latin-500-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Oswald';font-style:normal;font-weight:600;font-display:swap;src:url(fonts/ui/oswald-cyrillic-600-normal.woff2) format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:'Oswald';font-style:normal;font-weight:600;font-display:swap;src:url(fonts/ui/oswald-latin-600-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Oswald';font-style:normal;font-weight:700;font-display:swap;src:url(fonts/ui/oswald-cyrillic-700-normal.woff2) format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:'Oswald';font-style:normal;font-weight:700;font-display:swap;src:url(fonts/ui/oswald-latin-700-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+/* Дизайн-система «Світанкова зоря»: теплий світлий фон, темно-коричневий, червоний акцент,
+   заголовки Oswald, текст Onest, підписи великими літерами з розрядкою, прямі кути. */
+:root { --ink:#312a22; --ink2:#4a4036; --bg:#f8f6f3; --paper:#fff; --line:#e7e1dc; --muted:#81776d;
+  --faint:#b4a79b; --soft:#f3f1ee; --red:#d9362b; --redsoft:#fae7e5; --green:#72a18b; }
+* { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html,body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.5 Onest, system-ui, -apple-system, sans-serif; font-synthesis:none; }
+button,input,select,textarea { font:inherit; color:inherit; }
+button { cursor:pointer; }
+.brandbar { background:var(--ink); color:#e8e1d9; padding:calc(14px + env(safe-area-inset-top)) 18px 14px; position:sticky; top:0; z-index:5; }
+.brandbar .in { max-width:680px; margin:0 auto; display:flex; align-items:center; gap:10px; }
+.brandbar strong { font:600 19px/1 Oswald, sans-serif; letter-spacing:.05em; display:block; }
+.brandbar small { font-size:8px; letter-spacing:.14em; color:#c7bdb3; font-weight:700; }
+.brandbar .link { margin-left:auto; color:#e8e1d9; text-decoration:none; font-size:10px; letter-spacing:.14em; font-weight:700;
+  border:1px solid #6b5f53; padding:8px 10px; }
+main { max-width:680px; margin:0 auto; padding:22px 16px 140px; }
+.eyebrow, .step, label.f, .tabs button, summary, .meta-cap, .pill { font-size:10px; letter-spacing:.14em; font-weight:700; text-transform:uppercase; }
+.eyebrow { display:flex; gap:10px; align-items:center; color:#9c9187; }
+.eyebrow i { width:8px; height:8px; background:var(--red); display:inline-block; }
+h1 { font:700 clamp(38px,11vw,60px)/1.02 Oswald, Impact, sans-serif; letter-spacing:-.02em; text-transform:uppercase; margin:14px 0 10px; }
+h1 em { font-style:normal; color:#b7aca2; display:block; }
+.intro { font-size:13px; color:var(--muted); line-height:1.7; margin:0 0 20px; }
+.panel { background:var(--paper); border:1px solid var(--line); padding:18px; margin-top:12px; }
+.panel h2 { font:600 22px/1.1 Oswald, sans-serif; text-transform:uppercase; margin:4px 0 0; }
+.step { color:var(--faint); }
+label.f { display:block; color:var(--faint); margin:16px 0 8px; }
+input[type=text], textarea, select { width:100%; background:var(--paper); border:1px solid var(--line); border-radius:0;
+  padding:13px 14px; font-size:16px; outline:none; -webkit-appearance:none; appearance:none; }
+input[type=text]:focus, textarea:focus, select:focus { border-color:var(--ink); }
+textarea { min-height:240px; resize:vertical; line-height:1.5; background:var(--bg); }
+select { width:auto; padding:9px 30px 9px 12px; font-size:14px;
+  background:var(--paper) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23312a22'/%3E%3C/svg%3E") no-repeat right 11px center; }
+.hint { color:var(--muted); font-size:12.5px; line-height:1.6; margin-top:8px; }
+.tabs { display:grid; grid-template-columns:1fr 1fr; border:1px solid var(--line); background:var(--paper); }
+.tabs button { padding:15px 8px; border:0; background:transparent; color:#9c9187; border-left:3px solid transparent; }
+.tabs button.on { background:var(--ink); color:#fff; border-left-color:var(--red); }
+details { background:var(--paper); border:1px solid var(--line); margin-top:12px; }
+summary { padding:16px 18px; cursor:pointer; list-style:none; display:flex; justify-content:space-between; align-items:center; color:var(--ink); }
+summary::-webkit-details-marker { display:none; }
+summary::after { content:'+'; font:400 20px/1 Oswald, sans-serif; color:var(--red); }
+details[open] > summary::after { content:'–'; }
+.opts { padding:2px 18px 16px; }
+.row { display:flex; align-items:center; gap:12px; padding:11px 0; border-top:1px solid #f0ebe6; font-size:14px; }
+.row > span:first-child { flex:1; }
+.row b { font:600 15px Oswald, sans-serif; min-width:42px; text-align:right; }
+input[type=range] { flex:1.3; accent-color:var(--red); }
+input[type=checkbox] { width:22px; height:22px; accent-color:var(--red); }
+.slides { display:grid; gap:10px; margin-top:12px; }
+.slides canvas { width:100%; display:block; background:#000; border:1px solid var(--ink); }
+.btn { display:flex; justify-content:center; align-items:center; gap:8px; width:100%; padding:15px; margin-top:10px;
+  border:1px solid var(--ink); background:var(--paper); color:var(--ink); font-size:11px; letter-spacing:.14em; font-weight:700; text-transform:uppercase; cursor:pointer; }
+.btn.dark { background:var(--ink); color:#fff; }
+.file { margin-top:10px; }
+.file summary { text-transform:none; letter-spacing:0; font-size:15px; font-weight:600; display:block; }
+.file summary::after { display:none; }
+.file .meta { color:var(--muted); font-size:12px; font-weight:400; }
+.file .slides { padding:0 12px 12px; margin-top:0; }
+.recent a { color:var(--ink); text-decoration:none; display:block; padding:11px 0; border-top:1px solid #f0ebe6; font-size:14px; font-weight:600; }
+.recent small { color:var(--faint); font-weight:400; font-size:12px; }
+.card { background:var(--paper); border:1px solid var(--line); border-left:3px solid var(--red); padding:16px; margin:14px 0; font-size:14px; line-height:1.6; }
+.card b { display:block; font:600 18px Oswald, sans-serif; text-transform:uppercase; margin-bottom:4px; }
+.install b { display:inline; font:inherit; font-weight:700; text-transform:none; }
+.bar { position:fixed; left:0; right:0; bottom:0; padding:12px 16px calc(12px + env(safe-area-inset-bottom));
+  background:rgba(248,246,243,.94); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); border-top:1px solid var(--line); z-index:5; }
+.bar .in { max-width:680px; margin:0 auto; }
+button.main { width:100%; padding:17px; border:0; background:var(--red); color:#fff; font-size:12px; letter-spacing:.14em; font-weight:700; text-transform:uppercase;
+  display:flex; justify-content:space-between; align-items:center; }
+button.main::after { content:'↗'; font-size:16px; letter-spacing:0; }
+button.main:disabled { opacity:.35; cursor:not-allowed; }
+.status { font-size:12px; color:var(--muted); margin-top:9px; min-height:1.2em; }
+.status::before { content:'↗ '; color:var(--red); }
+.status a { color:var(--red); font-weight:600; }
+[hidden] { display:none !important; }
 </style>
 </head>
 <body>
+<header class="brandbar"><div class="in">
+  <svg class="star" width="34" height="34" viewBox="0 0 100 100" aria-hidden="true"><path d="M50.00 50.00L46.33 41.13L50.00 2.00Z" fill="rgb(243,241,239)" stroke="rgb(243,241,239)" stroke-width="0.4" stroke-linejoin="round"></path><path d="M50.00 50.00L50.00 2.00L53.67 41.13Z" fill="rgb(211,203,195)" stroke="rgb(211,203,195)" stroke-width="0.4" stroke-linejoin="round"></path><path d="M50.00 50.00L53.67 41.13L69.69 30.31Z" fill="rgb(255,254,254)" stroke="rgb(255,254,254)" stroke-width="0.4" stroke-linejoin="round"></path><path d="M50.00 50.00L69.69 30.31L58.87 46.33Z" fill="rgb(199,190,180)" stroke="rgb(199,190,180)" stroke-width="0.4" stroke-linejoin="round"></path><path d="M50.00 50.00L58.87 46.33L98.00 50.00Z" fill="rgb(250,249,248)" stroke="rgb(250,249,248)" stroke-width="0.4" stroke-linejoin="round"></path><path d="M50.00 50.00L98.00 50.00L58.87 53.67Z" fill="rgb(204,195,186)" stroke="rgb(204,195,186)" stroke-width="0.4" stroke-linejoin="round"></path><path d="M50.00 50.00L58.87 53.67L69.69 69.69Z" fill="rgb(232,228,224)" stroke="rgb(232,228,224)" stroke-width="0.4" stroke-linejoin="round"></path><path d="M50.00 50.00L69.69 69.69L53.67 58.87Z" fill="rgb(222,216,210)" stroke="rgb(222,216,210)" stroke-width="0.4" stroke-linejoin="round"></path><path d="M50.00 50.00L53.67 58.87L50.00 98.00Z" fill="rgb(211,203,195)" stroke="rgb(211,203,195)" stroke-width="0.4" stroke-linejoin="round"></path><path d="M50.00 50.00L50.00 98.00L46.33 58.87Z" fill="rgb(243,241,239)" stroke="rgb(243,241,239)" stroke-width="0.4" stroke-linejoin="round"></path><path d="M50.00 50.00L46.33 58.87L30.31 69.69Z" fill="rgb(199,190,180)" stroke="rgb(199,190,180)" stroke-width="0.4" stroke-linejoin="round"></path><path d="M50.00 50.00L30.31 69.69L41.13 53.67Z" fill="rgb(255,254,254)" stroke="rgb(255,254,254)" stroke-width="0.4" stroke-linejoin="round"></path><path d="M50.00 50.00L41.13 53.67L2.00 50.00Z" fill="rgb(204,195,186)" stroke="rgb(204,195,186)" stroke-width="0.4" stroke-linejoin="round"></path><path d="M50.00 50.00L2.00 50.00L41.13 46.33Z" fill="rgb(250,249,248)" stroke="rgb(250,249,248)" stroke-width="0.4" stroke-linejoin="round"></path><path d="M50.00 50.00L41.13 46.33L30.31 30.31Z" fill="rgb(222,216,210)" stroke="rgb(222,216,210)" stroke-width="0.4" stroke-linejoin="round"></path><path d="M50.00 50.00L30.31 30.31L46.33 41.13Z" fill="rgb(232,228,224)" stroke="rgb(232,228,224)" stroke-width="0.4" stroke-linejoin="round"></path></svg>
+  <div><strong>СТАНДАРТИЗАТОР</strong><small>ПРЕЗЕНТАЦІЇ ДЛЯ СЛУЖІННЯ</small></div>
+  <a class="link" href="../bible/">БІБЛІЯ ↗</a>
+</div></header>
 <main>
-  <h1>Стандартизатор</h1>
-  <div class="sub">Презентації за одним стандартом — одразу у Google Drive.</div>
+  <div class="eyebrow"><i></i> СТАНДАРТИЗАТОР / ПІСНІ</div>
+  <h1>Пісня.<em>Одним стандартом.</em></h1>
+  <p class="intro">Вставте текст або старі презентації — програма зробить слайди в єдиному стилі й збереже їх у спільну базу на Google Drive.</p>
 
   <div class="card" id="keyBox" hidden>
-    <b>🔑 Ключ доступу</b>
+    <b>Ключ доступу</b>
     <div class="hint">Вставте ключ, який дав адміністратор (або відкрийте посилання з ключем).</div>
     <input id="keyInput" type="text" placeholder="Ключ" autocomplete="off" style="margin-top:10px">
-    <button class="btn" id="keySave">Зберегти</button>
+    <button class="btn dark" id="keySave">Зберегти</button>
   </div>
   <div class="card install" id="installHint" hidden>
-    📲 Встановіть як програму: натисніть <b style="display:inline">Поділитися</b> ⬆️ внизу Safari →
-    <b style="display:inline">На початковий екран</b>. Далі відкривайте з іконки — працює швидше і без інтернету.
+    Встановіть як програму: натисніть <b>Поділитися</b> ⬆️ внизу Safari →
+    <b>На початковий екран</b>. Далі відкривайте з іконки — працює швидше і без інтернету.
     <button class="btn" id="installClose">Зрозуміло</button>
   </div>
 
@@ -84,29 +130,30 @@
     <button id="tabBatchBtn">Готові презентації</button>
   </div>
 
-  <section id="tabNew">
-  <label class="f" for="title">Назва (файлу)</label>
-  <input id="title" type="text" placeholder="Напр.: Велика Божа любов" autocomplete="off">
-
-  <label class="f" for="text">Текст</label>
-  <textarea id="text" placeholder="Перший куплет…&#10;&#10;Приспів:&#10;Текст приспіву…&#10;&#10;Другий куплет…&#10;&#10;Приспів"></textarea>
-  <div class="hint">Порожній рядок — новий слайд. «Приспів:» на початку — це приспів.
-    Просто «Приспів» окремим блоком — повторити попередній приспів.</div>
+  <section id="tabNew" class="panel">
+    <span class="step">01 / Введення</span><h2>Нова пісня</h2>
+    <label class="f" for="title">Назва (файлу)</label>
+    <input id="title" type="text" placeholder="Напр.: Велика Божа любов" autocomplete="off">
+    <label class="f" for="text">Текст</label>
+    <textarea id="text" placeholder="Перший куплет…&#10;&#10;Приспів:&#10;Текст приспіву…&#10;&#10;Другий куплет…&#10;&#10;Приспів"></textarea>
+    <div class="hint">Порожній рядок — новий слайд. «Приспів:» на початку — це приспів.
+      Просто «Приспів» окремим блоком — повторити попередній приспів.</div>
   </section>
 
-  <section id="tabBatch" hidden>
-    <div class="hint" style="margin-top:12px">Стандартизує вже готові презентації (.pptx) за тим самим алгоритмом.
+  <section id="tabBatch" class="panel" hidden>
+    <span class="step">01 / Імпорт</span><h2>Готові презентації</h2>
+    <div class="hint">Стандартизує вже готові презентації (.pptx) за тим самим алгоритмом.
       Виберіть файли на телефоні або покладіть їх у Google Drive у папку
       «Стандартизатор презентацій / Оригінали». Після збереження оригінали з Drive переносяться в «Оригінали / Готово».</div>
-    <label class="btn">📂 Вибрати файли .pptx
+    <label class="btn dark">Вибрати файли .pptx
       <input id="files" type="file" multiple hidden
         accept=".pptx,application/vnd.openxmlformats-officedocument.presentationml.presentation"></label>
-    <button class="btn" id="fromDrive">☁️ Взяти всі з папки «Оригінали»</button>
+    <button class="btn" id="fromDrive">Взяти всі з папки «Оригінали»</button>
     <div id="batchList"></div>
   </section>
 
   <details id="optsBox">
-    <summary>Налаштування</summary>
+    <summary>02 / Налаштування</summary>
     <div class="opts">
       <div class="row"><span>Затемнення фото</span>
         <input id="overlay" type="range" min="0" max="100" step="5"><b id="overlayVal"></b></div>
@@ -122,7 +169,7 @@
   <div class="slides" id="slides"></div>
 
   <details class="recent" id="recentBox">
-    <summary>Останні презентації</summary>
+    <summary>03 / Останні презентації</summary>
     <div class="opts" id="recent"></div>
   </details>
 </main>
