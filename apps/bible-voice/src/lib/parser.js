@@ -55,7 +55,7 @@ function bookAt(words, i) {
 
 /** Номер книги (1/2/3) зі слів перед назвою. */
 function numberBefore(tokens, idx) {
-  for (let k = idx - 1, steps = 0; k >= 0 && steps < 4; k--, steps++) {
+  for (let k = idx - 1, steps = 0; k >= 0 && steps < 7; k--, steps++) {   // «друге послання апостола Павла до солунян»
     const t = tokens[k];
     if (t.num !== undefined) return t.num >= 1 && t.num <= 4 ? { n: t.num, at: k } : null;
     if (!BOOK_PREFIX_FILLER.has(t.word)) return null;
@@ -127,6 +127,11 @@ export function findReferences(text, bible) {
   return refs;
 }
 
+// «Йоіла 2:28» (синодальна/англ. нумерація) = «Йоіла 3:1» в Огієнка
+const ALT_NUMBERING = {
+  'Йоіла 2': { from: 28, ch: 3 },
+};
+
 function interpret(book, nums, bible) {
   if (!nums.length) return null;
   const single = SINGLE_CHAPTER.has(BOOKS[book].name);
@@ -158,6 +163,12 @@ function interpret(book, nums, bible) {
     return { book, bookName: name, chapter: c, verse: v, verseEnd: ve, label, confidence };
   };
 
+  // поширені посилання за іншою (синодальною/англійською) нумерацією → нумерація Огієнка
+  const alt = ALT_NUMBERING[`${BOOKS[book].name} ${ch}`];
+  if (alt && verse != null && verse >= alt.from) {
+    const r = make(alt.ch, verse - alt.from + 1, verseEnd ? verseEnd - alt.from + 1 : null, 0.85);
+    if (r && !make(ch, verse, null, 1)) return r;
+  }
   let ref = make(ch, verse, verseEnd, verse == null ? 0.6 : 0.95);
   if (ref) return ref;
   // «Івана 316» → 3:16 (або 31:6); беремо перший варіант, що існує
@@ -169,8 +180,8 @@ function interpret(book, nums, bible) {
       if (ref) return ref;
     }
   }
-  // «Івана 3 162»? — вірш склеївся з наступним числом: пробуємо обрізати
-  if (verse != null && verse >= 10) {
+  // «Івана 3 162»? — вірш склеївся з наступним числом: пробуємо обрізати (лише тризначні)
+  if (verse != null && verse >= 100) {
     const s = String(verse);
     for (let k = s.length - 1; k >= 1; k--) {
       ref = make(ch, Number(s.slice(0, k)), null, 0.6);
