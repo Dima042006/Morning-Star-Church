@@ -3,11 +3,11 @@
 import { BOOKS, BOOK_INDEX } from './books.js';
 
 // той самий бекенд, що й у Стандартизатора (ключ доступу спільний — той самий сайт)
-const DEFAULT_API_URL = 'https://script.google.com/macros/s/AKfycbyFSk3-N2cR5Q7oVYsYThEX948QpdpD1xG9FJ91_vNMhf1nN4ptAVxdq_mcp961AHL3dg/exec';
+const DEFAULT_API_URL = 'https://script.google.com/macros/s/AKfycbxAZgVPCr_lmIobsOeovRbFgTh3oD2hYpC0QsQzM3n4TTXU8v0jz3r5ZP4l_KTtkd8SLQ/exec';
 const NAMES = BOOKS.map((b) => b.name);
 
 const ls = (k) => { try { return localStorage.getItem(k) || ''; } catch { return ''; } };
-const OLD_IDS = ['AKfycbyHPGCsWbZCiMpaxn32OP5cHgY7oBw4P6-HbGHv9PSSAVHF2x2TStb0_r9RlJJ2XOYz'];
+const OLD_IDS = ['AKfycbyFSk3-N2cR5Q7oVYsYThEX948QpdpD1xG9FJ91_vNMhf1nN4ptAVxdq_mcp961AHL3dg', 'AKfycbyHPGCsWbZCiMpaxn32OP5cHgY7oBw4P6-HbGHv9PSSAVHF2x2TStb0_r9RlJJ2XOYz'];
 const apiUrl = () => { const u = ls('apiUrl'); return u && !OLD_IDS.some((id) => u.includes(id)) ? u : DEFAULT_API_URL; };
 export const aiConfig = () => ({ key: ls('apiKey'), url: apiUrl(), enabled: ls('bv-ai') !== 'off' });
 export const setAiKey = (k) => { try { localStorage.setItem('apiKey', k.trim()); } catch {} };

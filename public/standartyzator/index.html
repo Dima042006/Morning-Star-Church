@@ -289,8 +289,8 @@ var lastBuild = null;
 var $ = function (id) { return document.getElementById(id); };
 
 /* ===================== ЗВ'ЯЗОК З GOOGLE DRIVE (Apps Script API) ===================== */
-var DEFAULT_API_URL = 'https://script.google.com/macros/s/AKfycbyFSk3-N2cR5Q7oVYsYThEX948QpdpD1xG9FJ91_vNMhf1nN4ptAVxdq_mcp961AHL3dg/exec';
-var OLD_API_IDS = ['AKfycbyHPGCsWbZCiMpaxn32OP5cHgY7oBw4P6-HbGHv9PSSAVHF2x2TStb0_r9RlJJ2XOYz'];
+var DEFAULT_API_URL = 'https://script.google.com/macros/s/AKfycbxAZgVPCr_lmIobsOeovRbFgTh3oD2hYpC0QsQzM3n4TTXU8v0jz3r5ZP4l_KTtkd8SLQ/exec';
+var OLD_API_IDS = ['AKfycbyFSk3-N2cR5Q7oVYsYThEX948QpdpD1xG9FJ91_vNMhf1nN4ptAVxdq_mcp961AHL3dg', 'AKfycbyHPGCsWbZCiMpaxn32OP5cHgY7oBw4P6-HbGHv9PSSAVHF2x2TStb0_r9RlJJ2XOYz'];
 function apiUrl() {
   try {
     var u = localStorage.getItem('apiUrl');
