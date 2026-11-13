@@ -289,9 +289,14 @@ var lastBuild = null;
 var $ = function (id) { return document.getElementById(id); };
 
 /* ===================== ЗВ'ЯЗОК З GOOGLE DRIVE (Apps Script API) ===================== */
-var DEFAULT_API_URL = 'https://script.google.com/macros/s/AKfycbyHPGCsWbZCiMpaxn32OP5cHgY7oBw4P6-HbGHv9PSSAVHF2x2TStb0_r9RlJJ2XOYz/exec';
+var DEFAULT_API_URL = 'https://script.google.com/macros/s/AKfycbyFSk3-N2cR5Q7oVYsYThEX948QpdpD1xG9FJ91_vNMhf1nN4ptAVxdq_mcp961AHL3dg/exec';
+var OLD_API_IDS = ['AKfycbyHPGCsWbZCiMpaxn32OP5cHgY7oBw4P6-HbGHv9PSSAVHF2x2TStb0_r9RlJJ2XOYz'];
 function apiUrl() {
-  try { return localStorage.getItem('apiUrl') || DEFAULT_API_URL; } catch (e) { return DEFAULT_API_URL; }
+  try {
+    var u = localStorage.getItem('apiUrl');
+    if (u && OLD_API_IDS.some(function (id) { return u.indexOf(id) >= 0; })) { localStorage.removeItem('apiUrl'); u = null; }
+    return u || DEFAULT_API_URL;
+  } catch (e) { return DEFAULT_API_URL; }
 }
 function apiKey() { try { return localStorage.getItem('apiKey') || ''; } catch (e) { return ''; } }
 function server(fn) {
