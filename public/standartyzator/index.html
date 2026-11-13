@@ -7,7 +7,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" href="icon-192.png">
-<meta name="theme-color" content="#312a22">
+<meta name="theme-color" content="#0f0d0b">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -28,105 +28,193 @@
 @font-face{font-family:'Oswald';font-style:normal;font-weight:600;font-display:swap;src:url(fonts/ui/oswald-latin-600-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 @font-face{font-family:'Oswald';font-style:normal;font-weight:700;font-display:swap;src:url(fonts/ui/oswald-cyrillic-700-normal.woff2) format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
 @font-face{font-family:'Oswald';font-style:normal;font-weight:700;font-display:swap;src:url(fonts/ui/oswald-latin-700-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
-/* Дизайн-система «Світанкова зоря»: теплий світлий фон, темно-коричневий, червоний акцент,
-   заголовки Oswald, текст Onest, підписи великими літерами з розрядкою, прямі кути. */
-:root { --ink:#312a22; --ink2:#4a4036; --bg:#f8f6f3; --paper:#fff; --line:#e7e1dc; --muted:#81776d;
-  --faint:#b4a79b; --soft:#f3f1ee; --red:#d9362b; --redsoft:#fae7e5; --green:#72a18b; }
+/* Дизайн-система «Світанкова зоря» — темна тема, дашборд.
+   Заголовки Oswald, текст Onest, підписи великими літерами з розрядкою, прямі кути, червоний акцент. */
+:root { --bg:#14110e; --side:#0f0d0b; --paper:#1d1915; --paper2:#25201b; --line:#332c25; --line2:#433a31;
+  --ink:#f2ece5; --muted:#a3978a; --faint:#6e6359; --red:#e2483b; --red2:#c93a2e; --redsoft:rgba(226,72,59,.12);
+  --green:#7fb39a; --side-w:248px; --bar-h:76px; }
 * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 html,body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.5 Onest, system-ui, -apple-system, sans-serif; font-synthesis:none; }
 button,input,select,textarea { font:inherit; color:inherit; }
 button { cursor:pointer; }
-.brandbar { background:var(--ink); color:#e8e1d9; padding:calc(14px + env(safe-area-inset-top)) 18px 14px; position:sticky; top:0; z-index:5; }
-.brandbar .in { max-width:680px; margin:0 auto; display:flex; align-items:center; gap:10px; }
-.brandbar strong { font:600 19px/1 Oswald, sans-serif; letter-spacing:.05em; display:block; }
-.brandbar small { font-size:8px; letter-spacing:.14em; color:#c7bdb3; font-weight:700; }
-.brandbar .link { margin-left:auto; color:#e8e1d9; text-decoration:none; font-size:10px; letter-spacing:.14em; font-weight:700;
-  border:1px solid #6b5f53; padding:8px 10px; }
-main { max-width:680px; margin:0 auto; padding:22px 16px 140px; }
-.eyebrow, .step, label.f, .tabs button, summary, .meta-cap, .pill { font-size:10px; letter-spacing:.14em; font-weight:700; text-transform:uppercase; }
-.eyebrow { display:flex; gap:10px; align-items:center; color:#9c9187; }
-.eyebrow i { width:8px; height:8px; background:var(--red); display:inline-block; }
-h1 { font:700 clamp(38px,11vw,60px)/1.02 Oswald, Impact, sans-serif; letter-spacing:-.02em; text-transform:uppercase; margin:14px 0 10px; }
-h1 em { font-style:normal; color:#b7aca2; display:block; }
-.intro { font-size:13px; color:var(--muted); line-height:1.7; margin:0 0 20px; }
-.panel { background:var(--paper); border:1px solid var(--line); padding:18px; margin-top:12px; }
-.panel h2 { font:600 22px/1.1 Oswald, sans-serif; text-transform:uppercase; margin:4px 0 0; }
+::selection { background:var(--red); color:#fff; }
+
+/* ---------- каркас ---------- */
+.app { display:grid; grid-template-columns:var(--side-w) 1fr; min-height:100vh; }
+.side { background:var(--side); border-right:1px solid var(--line); position:sticky; top:0; height:100vh;
+  display:flex; flex-direction:column; padding:22px 16px; gap:26px; }
+.brand { display:flex; align-items:center; gap:10px; padding:0 6px; }
+.brand strong { font:600 18px/1 Oswald, sans-serif; letter-spacing:.06em; display:block; }
+.brand small { font-size:8px; letter-spacing:.16em; color:var(--faint); font-weight:700; }
+.tabs { display:flex; flex-direction:column; gap:4px; }
+.tabs button, .side-link { display:flex; align-items:center; gap:12px; width:100%; padding:12px 12px; border:0; background:transparent;
+  color:var(--muted); text-align:left; font-size:14px; font-weight:500; border-left:2px solid transparent; text-decoration:none; }
+.tabs button i, .side-link i { font-style:normal; width:22px; text-align:center; font-size:16px; color:var(--faint); }
+.tabs button:hover, .side-link:hover { background:var(--paper); color:var(--ink); }
+.tabs button.on { background:var(--paper2); color:var(--ink); border-left-color:var(--red); }
+.tabs button.on i { color:var(--red); }
+.side-sep { font-size:9px; letter-spacing:.16em; font-weight:700; color:var(--faint); text-transform:uppercase; padding:0 12px; margin-bottom:-18px; }
+.side-foot { margin-top:auto; padding:0 12px; font-size:9px; letter-spacing:.16em; font-weight:700; color:var(--faint); text-transform:uppercase; line-height:1.8; }
+.side-foot b { color:var(--muted); display:block; }
+
+main { min-width:0; padding:28px 32px calc(var(--bar-h) + 32px); }
+.top { display:flex; align-items:flex-end; justify-content:space-between; gap:20px; margin-bottom:22px; }
+.eyebrow, .step, label.f, summary, .pill, .col-head { font-size:10px; letter-spacing:.16em; font-weight:700; text-transform:uppercase; }
+.eyebrow { display:flex; gap:10px; align-items:center; color:var(--faint); }
+.eyebrow i { width:7px; height:7px; background:var(--red); display:inline-block; }
+h1 { font:600 34px/1.05 Oswald, Impact, sans-serif; letter-spacing:.01em; text-transform:uppercase; margin:10px 0 0; }
+.top p { margin:6px 0 0; color:var(--muted); font-size:13px; max-width:560px; }
+
+.grid { display:grid; grid-template-columns:minmax(360px, 5fr) 7fr; gap:20px; align-items:start; }
+.grid.wide { grid-template-columns:1fr; }
+.grid.wide .col-right { display:none; }
+.col-left { display:flex; flex-direction:column; gap:14px; min-width:0; }
+.col-right { position:sticky; top:20px; background:var(--paper); border:1px solid var(--line); padding:18px; min-width:0;
+  max-height:calc(100vh - var(--bar-h) - 40px); overflow:auto; }
+.col-head { display:flex; justify-content:space-between; align-items:center; color:var(--faint); margin-bottom:14px; }
+.col-head span:last-child { color:var(--red); }
+
+.panel { background:var(--paper); border:1px solid var(--line); padding:20px; }
+.panel h2 { font:600 20px/1.1 Oswald, sans-serif; text-transform:uppercase; margin:4px 0 0; letter-spacing:.02em; }
 .step { color:var(--faint); }
-label.f { display:block; color:var(--faint); margin:16px 0 8px; }
-input[type=text], textarea, select { width:100%; background:var(--paper); border:1px solid var(--line); border-radius:0;
-  padding:13px 14px; font-size:16px; outline:none; -webkit-appearance:none; appearance:none; }
-input[type=text]:focus, textarea:focus, select:focus { border-color:var(--ink); }
-textarea { min-height:240px; resize:vertical; line-height:1.5; background:var(--bg); }
-select { width:auto; padding:9px 30px 9px 12px; font-size:14px;
-  background:var(--paper) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23312a22'/%3E%3C/svg%3E") no-repeat right 11px center; }
+label.f { display:block; color:var(--faint); margin:18px 0 8px; }
+.panel > label.f:first-child, .panel .prog-grid > div > label.f:first-child { margin-top:0; }
+input[type=text], input[type=date], textarea, select { width:100%; background:var(--bg); border:1px solid var(--line2); border-radius:0;
+  padding:12px 14px; font-size:16px; outline:none; -webkit-appearance:none; appearance:none; color:var(--ink); }
+input[type=text]:focus, input[type=date]:focus, textarea:focus, select:focus { border-color:var(--red); }
+input::placeholder, textarea::placeholder { color:var(--faint); }
+input[type=date] { min-height:48px; color-scheme:dark; }
+textarea { min-height:320px; resize:vertical; line-height:1.55; }
+textarea.small { min-height:80px; }
+select { width:auto; padding:9px 32px 9px 12px; font-size:14px;
+  background:var(--bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23a3978a'/%3E%3C/svg%3E") no-repeat right 11px center; }
 .hint { color:var(--muted); font-size:12.5px; line-height:1.6; margin-top:8px; }
-.tabs { display:grid; grid-template-columns:1fr 1fr 1fr; border:1px solid var(--line); background:var(--paper); }
-.tabs button { padding:15px 8px; border:0; background:transparent; color:#9c9187; border-left:3px solid transparent; }
-.tabs button.on { background:var(--ink); color:#fff; border-left-color:var(--red); }
-details { background:var(--paper); border:1px solid var(--line); margin-top:12px; }
-summary { padding:16px 18px; cursor:pointer; list-style:none; display:flex; justify-content:space-between; align-items:center; color:var(--ink); }
+
+details { background:var(--paper); border:1px solid var(--line); }
+summary { padding:16px 20px; cursor:pointer; list-style:none; display:flex; justify-content:space-between; align-items:center; color:var(--muted); }
+summary:hover { color:var(--ink); }
 summary::-webkit-details-marker { display:none; }
 summary::after { content:'+'; font:400 20px/1 Oswald, sans-serif; color:var(--red); }
 details[open] > summary::after { content:'–'; }
-.opts { padding:2px 18px 16px; }
-.row { display:flex; align-items:center; gap:12px; padding:11px 0; border-top:1px solid #f0ebe6; font-size:14px; }
-.row > span:first-child { flex:1; }
+.opts { padding:2px 20px 16px; }
+.row { display:flex; align-items:center; gap:12px; padding:11px 0; border-top:1px solid var(--line); font-size:14px; }
+.row > span:first-child { flex:1; color:var(--muted); }
 .row b { font:600 15px Oswald, sans-serif; min-width:42px; text-align:right; }
 input[type=range] { flex:1.3; accent-color:var(--red); }
-input[type=checkbox] { width:22px; height:22px; accent-color:var(--red); }
-.slides { display:grid; gap:10px; margin-top:12px; }
-.slides canvas { width:100%; display:block; background:#000; border:1px solid var(--ink); }
-.btn { display:flex; justify-content:center; align-items:center; gap:8px; width:100%; padding:15px; margin-top:10px;
-  border:1px solid var(--ink); background:var(--paper); color:var(--ink); font-size:11px; letter-spacing:.14em; font-weight:700; text-transform:uppercase; cursor:pointer; }
-.btn.dark { background:var(--ink); color:#fff; }
-.file { margin-top:10px; }
-.file summary { text-transform:none; letter-spacing:0; font-size:15px; font-weight:600; display:block; }
+input[type=checkbox] { width:20px; height:20px; accent-color:var(--red); }
+
+.slides { display:grid; gap:12px; }
+.slides canvas { width:100%; display:block; background:#000; border:1px solid var(--line2); }
+.empty-preview { border:1px dashed var(--line2); aspect-ratio:21/9; display:flex; align-items:center; justify-content:center;
+  color:var(--faint); font-size:13px; text-align:center; padding:20px; }
+.slides:not(:empty) + .empty-preview { display:none; }
+
+.btn { display:flex; justify-content:center; align-items:center; gap:8px; width:100%; padding:14px; margin-top:10px;
+  border:1px solid var(--line2); background:transparent; color:var(--ink); font-size:11px; letter-spacing:.14em; font-weight:700; text-transform:uppercase; cursor:pointer; }
+.btn:hover { border-color:var(--ink); }
+.btn.dark { background:var(--ink); color:var(--bg); border-color:var(--ink); }
+#tabBatch .btns { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+#batchList { display:grid; grid-template-columns:repeat(auto-fill, minmax(380px, 1fr)); gap:12px; margin-top:14px; align-items:start; }
+.file { margin-top:0; }
+.file summary { text-transform:none; letter-spacing:0; font-size:15px; font-weight:600; display:block; color:var(--ink); }
 .file summary::after { display:none; }
 .file .meta { color:var(--muted); font-size:12px; font-weight:400; }
-.file .slides { padding:0 12px 12px; margin-top:0; }
-.recent a { color:var(--ink); text-decoration:none; display:block; padding:11px 0; border-top:1px solid #f0ebe6; font-size:14px; font-weight:600; }
+.file .slides { padding:0 14px 14px; margin-top:0; }
+.recent a { color:var(--ink); text-decoration:none; display:block; padding:11px 0; border-top:1px solid var(--line); font-size:14px; font-weight:500; }
+.recent a:hover { color:var(--red); }
 .recent small { color:var(--faint); font-weight:400; font-size:12px; }
-.card { background:var(--paper); border:1px solid var(--line); border-left:3px solid var(--red); padding:16px; margin:14px 0; font-size:14px; line-height:1.6; }
+.card { background:var(--paper); border:1px solid var(--line); border-left:3px solid var(--red); padding:16px 18px; margin:0 0 16px; font-size:14px; line-height:1.6; }
 .card b { display:block; font:600 18px Oswald, sans-serif; text-transform:uppercase; margin-bottom:4px; }
 .install b { display:inline; font:inherit; font-weight:700; text-transform:none; }
-.bar { position:fixed; left:0; right:0; bottom:0; padding:12px 16px calc(12px + env(safe-area-inset-bottom));
-  background:rgba(248,246,243,.94); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); border-top:1px solid var(--line); z-index:5; }
-.bar .in { max-width:680px; margin:0 auto; }
-button.main { width:100%; padding:17px; border:0; background:var(--red); color:#fff; font-size:12px; letter-spacing:.14em; font-weight:700; text-transform:uppercase;
-  display:flex; justify-content:space-between; align-items:center; }
-button.main::after { content:'↗'; font-size:16px; letter-spacing:0; }
-button.main:disabled { opacity:.35; cursor:not-allowed; }
-.status { font-size:12px; color:var(--muted); margin-top:9px; min-height:1.2em; }
+
+/* ---------- нижня панель дій ---------- */
+.bar { position:fixed; left:var(--side-w); right:0; bottom:0; min-height:var(--bar-h); padding:12px 32px calc(12px + env(safe-area-inset-bottom));
+  background:rgba(20,17,14,.92); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); border-top:1px solid var(--line); z-index:5; }
+.bar .in { display:flex; align-items:center; gap:20px; }
+.status { flex:1; font-size:12.5px; color:var(--muted); min-height:1.2em; }
 .status::before { content:'↗ '; color:var(--red); }
 .status a { color:var(--red); font-weight:600; }
-[hidden] { display:none !important; }
-input[type=date] { width:100%; background:var(--paper); border:1px solid var(--line); border-radius:0; padding:12px 14px; font-size:16px; -webkit-appearance:none; appearance:none; min-height:48px; color:var(--ink); }
+button.main { flex:none; width:380px; max-width:100%; padding:16px 20px; border:0; background:var(--red); color:#fff; font-size:12px; letter-spacing:.14em; font-weight:700; text-transform:uppercase;
+  display:flex; justify-content:space-between; align-items:center; gap:14px; }
+button.main:hover:not(:disabled) { background:var(--red2); }
+button.main::after { content:'↗'; font-size:16px; letter-spacing:0; }
+button.main:disabled { opacity:.3; cursor:not-allowed; }
+
+/* ---------- програма служіння ---------- */
+.prog-grid { display:grid; grid-template-columns:1fr 1fr; gap:28px; margin-top:6px; }
 .prog-list { margin-top:8px; border-top:1px solid var(--line); }
-.prog-item { display:flex; align-items:center; gap:8px; padding:10px 0; border-bottom:1px solid #f0ebe6; font-size:15px; }
-.prog-item .n { font:600 16px Oswald, sans-serif; color:var(--red); min-width:22px; }
+.prog-item { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid var(--line); font-size:15px; }
+.prog-item .n { font:600 17px Oswald, sans-serif; color:var(--red); min-width:24px; }
 .prog-item .t { flex:1; min-width:0; }
 .prog-item.note .t { font-style:italic; color:var(--muted); }
-.prog-item button { border:1px solid var(--line); background:var(--paper); width:36px; height:36px; font-size:15px; color:var(--ink); flex:none; }
+.prog-item button { border:1px solid var(--line2); background:transparent; width:34px; height:34px; font-size:14px; color:var(--muted); flex:none; }
+.prog-item button:hover { color:var(--ink); border-color:var(--ink); }
 .prog-empty { color:var(--faint); font-size:13px; padding:14px 0; }
-.song-results button { display:block; width:100%; text-align:left; border:0; border-bottom:1px solid #f0ebe6; background:transparent; padding:12px 2px; font-size:15px; color:var(--ink); }
+.song-results { max-height:420px; overflow:auto; }
+.song-results button { display:block; width:100%; text-align:left; border:0; border-bottom:1px solid var(--line); background:transparent; padding:11px 4px; font-size:15px; color:var(--ink); }
+.song-results button:hover { background:var(--paper2); }
 .song-results button::before { content:'+ '; color:var(--red); font-weight:700; }
 .song-results .in-prog { color:var(--faint); }
 .inline { display:flex; gap:8px; }
 .inline input { flex:1; }
-.inline .btn { width:auto; margin-top:0; padding:0 16px; }
-textarea.small { min-height:70px; }
+.inline .btn { width:auto; margin-top:0; padding:0 18px; }
+
+[hidden] { display:none !important; }
+
+/* ---------- планшет / телефон ---------- */
+@media (max-width: 1100px) {
+  .grid { grid-template-columns:1fr; }
+  .col-right { position:static; max-height:none; }
+}
+@media (max-width: 860px) {
+  .app { grid-template-columns:1fr; }
+  .side { position:static; z-index:6; height:auto; flex-direction:row; flex-wrap:wrap; align-items:center; gap:10px 14px;
+    padding:calc(12px + env(safe-area-inset-top)) 14px 0; border-right:0; border-bottom:1px solid var(--line); }
+  .side-sep, .side-foot { display:none; }
+  .brand { order:0; }
+  .side-link { order:1; }
+  .tabs { order:2; }
+  .side-link { width:auto; margin-left:auto; padding:8px 10px; border:1px solid var(--line2); font-size:10px; letter-spacing:.14em; font-weight:700; text-transform:uppercase; }
+  .side-link i { display:none; }
+  .tabs { flex-direction:row; width:100%; gap:0; overflow-x:auto; }
+  .tabs button { flex:1; justify-content:center; padding:12px 6px; border-left:0; border-bottom:2px solid transparent; font-size:13px; white-space:nowrap; }
+  .tabs button.on { border-bottom-color:var(--red); background:transparent; }
+  .tabs button i { display:none; }
+  main { padding:20px 14px calc(var(--bar-h) + 70px); }
+  h1 { font-size:28px; }
+  .top p { display:none; }
+  .prog-grid { grid-template-columns:1fr; gap:6px; }
+  #tabBatch .btns { grid-template-columns:1fr; }
+  #batchList { grid-template-columns:1fr; }
+  textarea { min-height:240px; }
+  .bar { left:0; padding:10px 14px calc(10px + env(safe-area-inset-bottom)); }
+  .bar .in { flex-direction:column-reverse; align-items:stretch; gap:8px; }
+  button.main { width:100%; }
+}
 </style>
 </head>
 <body>
-<header class="brandbar"><div class="in">
-  <svg class="star" width="34" height="34" viewBox="0 0 100 100" aria-hidden="true"><path d="M50.00 50.00L46.33 41.13L50.00 2.00Z" fill="rgb(243,241,239)" stroke="rgb(243,241,239)" stroke-width="0.4" stroke-linejoin="round"></path><path d="M50.00 50.00L50.00 2.00L53.67 41.13Z" fill="rgb(211,203,195)" stroke="rgb(211,203,195)" stroke-width="0.4" stroke-linejoin="round"></path><path d="M50.00 50.00L53.67 41.13L69.69 30.31Z" fill="rgb(255,254,254)" stroke="rgb(255,254,254)" stroke-width="0.4" stroke-linejoin="round"></path><path d="M50.00 50.00L69.69 30.31L58.87 46.33Z" fill="rgb(199,190,180)" stroke="rgb(199,190,180)" stroke-width="0.4" stroke-linejoin="round"></path><path d="M50.00 50.00L58.87 46.33L98.00 50.00Z" fill="rgb(250,249,248)" stroke="rgb(250,249,248)" stroke-width="0.4" stroke-linejoin="round"></path><path d="M50.00 50.00L98.00 50.00L58.87 53.67Z" fill="rgb(204,195,186)" stroke="rgb(204,195,186)" stroke-width="0.4" stroke-linejoin="round"></path><path d="M50.00 50.00L58.87 53.67L69.69 69.69Z" fill="rgb(232,228,224)" stroke="rgb(232,228,224)" stroke-width="0.4" stroke-linejoin="round"></path><path d="M50.00 50.00L69.69 69.69L53.67 58.87Z" fill="rgb(222,216,210)" stroke="rgb(222,216,210)" stroke-width="0.4" stroke-linejoin="round"></path><path d="M50.00 50.00L53.67 58.87L50.00 98.00Z" fill="rgb(211,203,195)" stroke="rgb(211,203,195)" stroke-width="0.4" stroke-linejoin="round"></path><path d="M50.00 50.00L50.00 98.00L46.33 58.87Z" fill="rgb(243,241,239)" stroke="rgb(243,241,239)" stroke-width="0.4" stroke-linejoin="round"></path><path d="M50.00 50.00L46.33 58.87L30.31 69.69Z" fill="rgb(199,190,180)" stroke="rgb(199,190,180)" stroke-width="0.4" stroke-linejoin="round"></path><path d="M50.00 50.00L30.31 69.69L41.13 53.67Z" fill="rgb(255,254,254)" stroke="rgb(255,254,254)" stroke-width="0.4" stroke-linejoin="round"></path><path d="M50.00 50.00L41.13 53.67L2.00 50.00Z" fill="rgb(204,195,186)" stroke="rgb(204,195,186)" stroke-width="0.4" stroke-linejoin="round"></path><path d="M50.00 50.00L2.00 50.00L41.13 46.33Z" fill="rgb(250,249,248)" stroke="rgb(250,249,248)" stroke-width="0.4" stroke-linejoin="round"></path><path d="M50.00 50.00L41.13 46.33L30.31 30.31Z" fill="rgb(222,216,210)" stroke="rgb(222,216,210)" stroke-width="0.4" stroke-linejoin="round"></path><path d="M50.00 50.00L30.31 30.31L46.33 41.13Z" fill="rgb(232,228,224)" stroke="rgb(232,228,224)" stroke-width="0.4" stroke-linejoin="round"></path></svg>
-  <div><strong>СТАНДАРТИЗАТОР</strong><small>ПРЕЗЕНТАЦІЇ ДЛЯ СЛУЖІННЯ</small></div>
-  <a class="link" href="../bible/">БІБЛІЯ ↗</a>
-</div></header>
-<main>
-  <div class="eyebrow"><i></i> СТАНДАРТИЗАТОР / ПІСНІ</div>
-  <h1>Пісня.<em>Одним стандартом.</em></h1>
-  <p class="intro">Вставте текст або старі презентації — програма зробить слайди в єдиному стилі й збереже їх у спільну базу на Google Drive.</p>
+<div class="app">
+  <aside class="side">
+    <div class="brand"><svg class="star" width="30" height="30" viewBox="0 0 100 100" aria-hidden="true"><path d="M50.00 50.00L46.33 41.13L50.00 2.00Z" fill="rgb(243,241,239)" stroke="rgb(243,241,239)" stroke-width="0.4" stroke-linejoin="round"></path><path d="M50.00 50.00L50.00 2.00L53.67 41.13Z" fill="rgb(211,203,195)" stroke="rgb(211,203,195)" stroke-width="0.4" stroke-linejoin="round"></path><path d="M50.00 50.00L53.67 41.13L69.69 30.31Z" fill="rgb(255,254,254)" stroke="rgb(255,254,254)" stroke-width="0.4" stroke-linejoin="round"></path><path d="M50.00 50.00L69.69 30.31L58.87 46.33Z" fill="rgb(199,190,180)" stroke="rgb(199,190,180)" stroke-width="0.4" stroke-linejoin="round"></path><path d="M50.00 50.00L58.87 46.33L98.00 50.00Z" fill="rgb(250,249,248)" stroke="rgb(250,249,248)" stroke-width="0.4" stroke-linejoin="round"></path><path d="M50.00 50.00L98.00 50.00L58.87 53.67Z" fill="rgb(204,195,186)" stroke="rgb(204,195,186)" stroke-width="0.4" stroke-linejoin="round"></path><path d="M50.00 50.00L58.87 53.67L69.69 69.69Z" fill="rgb(232,228,224)" stroke="rgb(232,228,224)" stroke-width="0.4" stroke-linejoin="round"></path><path d="M50.00 50.00L69.69 69.69L53.67 58.87Z" fill="rgb(222,216,210)" stroke="rgb(222,216,210)" stroke-width="0.4" stroke-linejoin="round"></path><path d="M50.00 50.00L53.67 58.87L50.00 98.00Z" fill="rgb(211,203,195)" stroke="rgb(211,203,195)" stroke-width="0.4" stroke-linejoin="round"></path><path d="M50.00 50.00L50.00 98.00L46.33 58.87Z" fill="rgb(243,241,239)" stroke="rgb(243,241,239)" stroke-width="0.4" stroke-linejoin="round"></path><path d="M50.00 50.00L46.33 58.87L30.31 69.69Z" fill="rgb(199,190,180)" stroke="rgb(199,190,180)" stroke-width="0.4" stroke-linejoin="round"></path><path d="M50.00 50.00L30.31 69.69L41.13 53.67Z" fill="rgb(255,254,254)" stroke="rgb(255,254,254)" stroke-width="0.4" stroke-linejoin="round"></path><path d="M50.00 50.00L41.13 53.67L2.00 50.00Z" fill="rgb(204,195,186)" stroke="rgb(204,195,186)" stroke-width="0.4" stroke-linejoin="round"></path><path d="M50.00 50.00L2.00 50.00L41.13 46.33Z" fill="rgb(250,249,248)" stroke="rgb(250,249,248)" stroke-width="0.4" stroke-linejoin="round"></path><path d="M50.00 50.00L41.13 46.33L30.31 30.31Z" fill="rgb(222,216,210)" stroke="rgb(222,216,210)" stroke-width="0.4" stroke-linejoin="round"></path><path d="M50.00 50.00L30.31 30.31L46.33 41.13Z" fill="rgb(232,228,224)" stroke="rgb(232,228,224)" stroke-width="0.4" stroke-linejoin="round"></path></svg>
+      <div><strong>СТАНДАРТИЗАТОР</strong><small>ПРЕЗЕНТАЦІЇ ДЛЯ СЛУЖІННЯ</small></div></div>
+    <div class="side-sep">Робота</div>
+    <nav class="tabs">
+      <button id="tabNewBtn" class="on"><i>✎</i>Новий текст</button>
+      <button id="tabBatchBtn"><i>⇪</i>Готові pptx</button>
+      <button id="tabProgBtn"><i>☰</i>Програма</button>
+    </nav>
+    <div class="side-sep">Інше</div>
+    <a class="side-link" href="../bible/"><i>✦</i>Біблія ↗</a>
+    <div class="side-foot">Створено для служіння<b>Світанкова зоря</b></div>
+  </aside>
+
+  <main>
+    <header class="top"><div>
+      <div class="eyebrow"><i></i> <span id="crumb">СТАНДАРТИЗАТОР / ПІСНІ</span></div>
+      <h1 id="pageTitle">Нова пісня</h1>
+      <p id="pageSub">Вставте текст — програма зробить слайди в єдиному стилі й збереже їх у спільну базу на Google Drive.</p>
+    </div></header>
 
   <div class="card" id="keyBox" hidden>
     <b>Ключ доступу</b>
@@ -140,15 +228,10 @@ textarea.small { min-height:70px; }
     <button class="btn" id="installClose">Зрозуміло</button>
   </div>
 
-  <div class="tabs">
-    <button id="tabNewBtn" class="on">Новий текст</button>
-    <button id="tabBatchBtn">Готові pptx</button>
-    <button id="tabProgBtn">Програма</button>
-  </div>
-
+    <div class="grid" id="grid">
+      <div class="col-left">
   <section id="tabNew" class="panel">
-    <span class="step">01 / Введення</span><h2>Нова пісня</h2>
-    <label class="f" for="title">Назва (файлу)</label>
+        <label class="f" for="title">Назва (файлу)</label>
     <input id="title" type="text" placeholder="Напр.: Велика Божа любов" autocomplete="off">
     <label class="f" for="text">Текст</label>
     <textarea id="text" placeholder="Перший куплет…&#10;&#10;Приспів:&#10;Текст приспіву…&#10;&#10;Другий куплет…&#10;&#10;Приспів"></textarea>
@@ -157,20 +240,18 @@ textarea.small { min-height:70px; }
   </section>
 
   <section id="tabBatch" class="panel" hidden>
-    <span class="step">01 / Імпорт</span><h2>Готові презентації</h2>
-    <div class="hint">Стандартизує вже готові презентації (.pptx) за тим самим алгоритмом.
+        <div class="hint">Стандартизує вже готові презентації (.pptx) за тим самим алгоритмом.
       Виберіть файли на телефоні або покладіть їх у Google Drive у папку
       «Стандартизатор презентацій / Оригінали». Після збереження оригінали з Drive переносяться в «Оригінали / Готово».</div>
-    <label class="btn dark">Вибрати файли .pptx
+    <div class="btns"><label class="btn dark">Вибрати файли .pptx
       <input id="files" type="file" multiple hidden
         accept=".pptx,application/vnd.openxmlformats-officedocument.presentationml.presentation"></label>
-    <button class="btn" id="fromDrive">Взяти всі з папки «Оригінали»</button>
+    <button class="btn" id="fromDrive">Взяти всі з папки «Оригінали»</button></div>
     <div id="batchList"></div>
   </section>
 
   <section id="tabProg" class="panel" hidden>
-    <span class="step">01 / Служіння</span><h2>Програма на дату</h2>
-    <div class="hint">Виберіть дату, додайте пісні з бази в потрібному порядку і надішліть — програма разом із презентаціями прийде операторам у Telegram.</div>
+    <div class="prog-grid"><div>
     <label class="f" for="progDate">Дата служіння</label>
     <input id="progDate" type="date">
     <label class="f">Порядок</label>
@@ -179,12 +260,14 @@ textarea.small { min-height:70px; }
     <input id="songSearch" type="text" placeholder="Почніть вводити назву…" autocomplete="off">
     <div class="song-results" id="songResults"></div>
     <div class="hint" id="songsInfo"></div>
+    </div><div>
     <label class="f" for="noteText">Інший пункт (проповідь, оголошення, вірш…)</label>
     <div class="inline"><input id="noteText" type="text" placeholder="Напр.: Проповідь — пастор Іван"><button class="btn" id="noteAdd">Додати</button></div>
     <label class="f" for="progNote">Примітка для операторів</label>
     <textarea id="progNote" class="small" placeholder="Напр.: друга пісня — двічі приспів наприкінці"></textarea>
     <label class="f" for="progAuthor">Хто складає</label>
     <input id="progAuthor" type="text" placeholder="Ваше ім'я">
+    </div></div>
   </section>
 
   <details id="optsBox">
@@ -201,17 +284,23 @@ textarea.small { min-height:70px; }
     </div>
   </details>
 
-  <div class="slides" id="slides"></div>
-
   <details class="recent" id="recentBox">
     <summary>03 / Останні презентації</summary>
     <div class="opts" id="recent"></div>
   </details>
-</main>
+      </div>
+      <div class="col-right" id="previewCol">
+        <div class="col-head"><span>Попередній перегляд · 21:9</span><span>LIVE</span></div>
+        <div class="slides" id="slides"></div>
+        <div class="empty-preview">Слайди з’являться тут, щойно ви почнете вводити текст</div>
+      </div>
+    </div>
+  </main>
+</div>
 
 <div class="bar"><div class="in">
-  <button class="main" id="save" disabled>Зберегти в Google Drive</button>
   <div class="status" id="status">Завантаження…</div>
+  <button class="main" id="save" disabled>Зберегти в Google Drive</button>
 </div></div>
 
 <script>
@@ -972,6 +1061,11 @@ function switchTab(tab) {
   $('slides').hidden = tab !== 'new';
   $('tabBatch').hidden = tab !== 'batch';
   $('tabProg').hidden = tab !== 'prog';
+  $('grid').classList.toggle('wide', tab !== 'new');
+  var T = { new: ['ПІСНІ', 'Нова пісня', 'Вставте текст — програма зробить слайди в єдиному стилі й збереже їх у спільну базу на Google Drive.'],
+    batch: ['ІМПОРТ', 'Готові презентації', 'Старі .pptx — за тим самим стандартом: шрифт, фон, розбивка рядків.'],
+    prog: ['СЛУЖІННЯ', 'Програма на дату', 'Пісні з бази в потрібному порядку — програма разом із презентаціями прийде в Telegram.'] }[tab];
+  $('crumb').textContent = 'СТАНДАРТИЗАТОР / ' + T[0]; $('pageTitle').textContent = T[1]; $('pageSub').textContent = T[2];
   $('optsBox').hidden = tab === 'prog';
   $('recentBox').hidden = tab === 'prog';
   if (tab === 'prog') { openProgramTab(); return; }
