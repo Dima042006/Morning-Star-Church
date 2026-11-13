@@ -3,7 +3,7 @@
  * Сторінка (index.html) береться з мережі, якщо вона є (щоб оновлення приходили одразу),
  * а без мережі — з кешу. Решта файлів — з кешу. Запити до Google (Apps Script) не кешуються.
  * Після змін у файлах збільшіть VERSION. */
-const VERSION = 'v8';
+const VERSION = 'v9';
 const CACHE = 'standartyzator-' + VERSION;
 const CORE = [
   './',

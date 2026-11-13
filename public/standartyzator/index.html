@@ -1025,7 +1025,13 @@ async function loadSongs() {
     songs = await server('listSongs');
     lsSet('songsCache', songs);
     renderSongResults();
-  } catch (e) { if (!songs) $('songsInfo').textContent = 'Не вдалося завантажити пісні: ' + e.message; }
+  } catch (e) {
+    if (songs) return;
+    $('songResults').innerHTML = '';
+    $('songsInfo').textContent = /Невідома дія/.test(e.message)
+      ? 'Сервер Google ще старої версії: оновіть Code.gs в Apps Script і зробіть «Керування розгортаннями» → ✏️ → «Нова версія».'
+      : 'Не вдалося завантажити пісні: ' + e.message;
+  }
 }
 
 function renderSongResults() {
