@@ -1,0 +1,330 @@
+/* ═════════ Церква Божого Спасіння — стиль соцмереж: папір, червоний, кобальт, рукопис ═════════ */
+:root {
+  --paper: #EEE6D5; --paper2: #E6DCC6; --ink: #1E2723; --muted: #45504A; --soft: #C9C0AE;
+  --red: #E4472E; --red2: #C93A23; --cobalt: #2C4FA3; --orange: #F08A35; --sky: #A9C6E8; --blue: #1F33C8;
+  --display: Unbounded, 'Arial Black', sans-serif; --hand: Caveat, cursive; --body: Manrope, system-ui, sans-serif;
+  --wrap: 1360px; --pad: 40px;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 90px; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 500 17px/1.6 var(--body); -webkit-font-smoothing: antialiased; overflow-x: clip; }
+html { overflow-x: clip; }
+img { max-width: 100%; display: block; }
+a { color: inherit; }
+button, input, textarea { font: inherit; color: inherit; }
+[hidden] { display: none !important; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.skip { position: absolute; left: -999px; top: 10px; background: var(--ink); color: var(--paper); padding: 10px 16px; z-index: 100; }
+.skip:focus { left: 10px; }
+:focus-visible { outline: 3px solid var(--cobalt); outline-offset: 3px; }
+
+.grain { position: fixed; inset: 0; pointer-events: none; z-index: 90; background: url(assets/grain.png) 0 0 / 240px 240px; opacity: .85; }
+.wrap { max-width: var(--wrap); margin: 0 auto; padding: 0 var(--pad); }
+.section { padding: 120px 0; position: relative; }
+.section--dark { background: var(--ink); color: var(--paper); }
+.section--cobalt { background: var(--cobalt); color: var(--paper); }
+.section--paper2 { background: var(--paper2); }
+
+/* ── типографіка ── */
+.h1, .h2 { font-family: var(--display); font-weight: 900; text-transform: uppercase; margin: 0; letter-spacing: -.035em; }
+.h1 { font-size: clamp(44px, 7.6vw, 128px); line-height: .9; color: var(--red); }
+.h2 { font-size: clamp(38px, 5.4vw, 88px); line-height: .92; color: var(--red); }
+.section--dark .h2, .section--cobalt .h2 { color: var(--paper); }
+.hand { font-family: var(--hand); font-weight: 700; line-height: 1; margin: 0; display: inline-block; }
+.tilt-l { transform: rotate(-4deg); } .tilt-r { transform: rotate(3deg); }
+.lede { font-size: 20px; line-height: 1.6; max-width: 580px; margin: 0; }
+.muted { color: var(--muted); }
+.section--dark .muted, .section--cobalt .muted { color: var(--soft); }
+.head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 20px 40px; margin-bottom: 56px; }
+.head__aside { max-width: 420px; margin: 0; }
+.label { font-family: var(--display); font-weight: 700; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; }
+
+/* ── кнопки ── */
+.btn { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; border: 2px solid transparent; border-radius: 999px;
+  font-family: var(--display); font-weight: 700; font-size: 14px; letter-spacing: .03em; text-transform: uppercase; padding: 18px 26px; cursor: pointer; transition: transform .15s; }
+.btn:hover { transform: translateY(-2px) rotate(-1deg); }
+.btn--red { background: var(--red); color: #FFF8EC; }
+.btn--ink { background: var(--ink); color: var(--paper); }
+.btn--line { border-color: var(--ink); color: var(--ink); background: transparent; }
+.btn--light { border-color: var(--paper); color: var(--paper); background: transparent; }
+.btn--orange { background: var(--orange); color: var(--ink); }
+.btns { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 34px; }
+
+/* ── шапка ── */
+.header { position: sticky; top: 0; z-index: 50; background: rgba(238,230,213,.92); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border-bottom: 2px solid transparent; transition: border-color .2s; }
+.header.is-scrolled { border-bottom-color: var(--ink); }
+.header__in { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding-top: 16px; padding-bottom: 16px; }
+.logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+.logo__mark { width: 46px; height: 46px; background: var(--red); display: grid; place-items: center; transform: rotate(-6deg); flex: none; }
+.logo__text { font-family: var(--display); font-weight: 900; font-size: 12.5px; line-height: 1.15; text-transform: uppercase; }
+.nav { display: flex; gap: 2px 22px; flex-wrap: wrap; justify-content: center; }
+.nav a { text-decoration: none; font-weight: 700; font-size: 14.5px; padding: 10px 2px; }
+.nav a:hover { color: var(--cobalt); }
+.header__right { display: flex; align-items: center; gap: 10px; }
+.live-pill { display: inline-flex; align-items: center; gap: 8px; background: var(--red); color: #FFF8EC; font-family: var(--display); font-weight: 700; font-size: 12px; text-transform: uppercase; padding: 10px 14px; border-radius: 999px; text-decoration: none; }
+.live-pill i, .dot { width: 9px; height: 9px; border-radius: 50%; background: #FFF8EC; animation: pulse 1.4s infinite; }
+@keyframes pulse { 50% { opacity: .25; } }
+.burger { display: none; width: 52px; height: 52px; border: 0; border-radius: 50%; background: var(--red); color: #FFF8EC; align-items: center; justify-content: center; cursor: pointer; }
+.mnav { position: fixed; inset: 0; z-index: 80; background: var(--cobalt); color: var(--paper); padding: 22px 20px 40px; display: flex; flex-direction: column; overflow-y: auto; }
+.mnav__top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.mnav__close { width: 52px; height: 52px; border: 2px solid var(--paper); border-radius: 50%; background: transparent; color: var(--paper); display: grid; place-items: center; cursor: pointer; }
+.mnav a.mlink { color: var(--paper); text-decoration: none; font-family: var(--display); font-weight: 900; font-size: 28px; text-transform: uppercase; padding: 10px 0; border-bottom: 1px solid rgba(238,230,213,.3); }
+.mnav .btn { margin-top: 26px; justify-content: center; }
+
+/* ── герой ── */
+.hero { display: flex; flex-wrap: wrap; gap: 48px; align-items: center; padding-top: 40px; padding-bottom: 90px; }
+.hero__text { flex: 999 1 560px; min-width: 0; }
+.hero__text .lede { margin-top: 34px; }
+.ticket { margin-top: 46px; display: inline-flex; background: var(--cobalt); color: var(--paper); transform: rotate(-1.5deg); box-shadow: 0 14px 0 -6px rgba(30,39,35,.18); max-width: 100%; }
+.ticket > div { padding: 18px 26px; }
+.ticket > div:first-child { border-right: 2px dashed rgba(238,230,213,.55); }
+.ticket__when { font-family: var(--display); font-weight: 900; font-size: 30px; line-height: 1.1; }
+.ticket__title { font-family: var(--display); font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: .05em; }
+.collage { flex: 1 1 320px; min-width: 0; position: relative; height: 640px; max-width: 560px; margin: 0 auto; }
+.collage__img { position: absolute; right: 0; top: 10px; width: 78%; aspect-ratio: 762 / 1000; object-fit: cover; transform: rotate(4deg); box-shadow: 0 30px 50px -20px rgba(30,39,35,.45); }
+.note { position: absolute; left: 0; bottom: 30px; width: 58%; background: var(--orange); padding: 46px 28px 30px; transform: rotate(-6deg); box-shadow: 0 26px 40px -18px rgba(30,39,35,.5); }
+.note__title { font-family: var(--display); font-weight: 900; font-size: 32px; line-height: 1; color: var(--blue); letter-spacing: -.02em; }
+.note p { margin: 16px 0 0; font-weight: 700; font-size: 16px; line-height: 1.35; }
+.pin { position: absolute; top: -22px; left: 50%; margin-left: -17px; }
+.collage__hand { position: absolute; left: 0; top: 0; font-size: 30px; transform: rotate(-8deg); max-width: 190px; }
+.collage__arrow { position: absolute; left: 34%; top: 40px; }
+
+/* ── інфорядок ── */
+.infobar { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 2px solid var(--ink); background: var(--paper); position: relative; z-index: 3; }
+.infobar li { padding: 22px 24px; border-right: 2px solid var(--ink); display: flex; flex-direction: column; gap: 6px; }
+.infobar li:last-child { border-right: 0; }
+.infobar strong { font-family: var(--display); font-weight: 700; font-size: 17px; line-height: 1.25; }
+.infobar .label { color: var(--muted); }
+
+/* ── стрічка ── */
+.marquee { background: var(--cobalt); color: var(--paper); transform: rotate(-2deg); margin: 90px -40px 0; padding: 20px 0; overflow: hidden; position: relative; z-index: 2; }
+.marquee__track { display: flex; width: max-content; animation: run 38s linear infinite; font-family: var(--display); font-weight: 900; font-size: clamp(24px, 3.4vw, 52px); text-transform: uppercase; white-space: nowrap; }
+.marquee__track span { padding: 0 18px; }
+.marquee__track b { color: var(--orange); }
+@keyframes run { to { transform: translateX(-33.333%); } }
+
+/* ── трансляції ── */
+.countdown { display: flex; flex-direction: column; gap: 10px; }
+.countdown__boxes { display: flex; gap: 10px; }
+.countdown__boxes div { background: var(--paper); color: var(--ink); min-width: 84px; padding: 12px 10px; text-align: center; transform: rotate(-1.5deg); }
+.countdown__boxes div:nth-child(even) { transform: rotate(1.5deg); }
+.countdown__boxes strong { display: block; font-family: var(--display); font-weight: 900; font-size: 34px; line-height: 1; }
+.countdown__boxes small { font-family: var(--hand); font-weight: 700; font-size: 22px; }
+.live-now { display: inline-flex; align-items: center; gap: 12px; background: var(--red); color: #FFF8EC; font-family: var(--display); font-weight: 700; text-transform: uppercase; padding: 16px 22px; border-radius: 999px; }
+.stream { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 34px; align-items: start; }
+.player { position: relative; aspect-ratio: 16 / 9; display: grid; place-items: center; text-decoration: none; color: var(--paper); overflow: hidden; transform: rotate(-.6deg); border: 2px solid rgba(238,230,213,.25); background: radial-gradient(circle at 30% 30%, #2a3631, #121815); }
+.player__badge { position: absolute; top: 18px; left: 20px; display: flex; align-items: center; gap: 10px; background: var(--red); color: #FFF8EC; font-family: var(--display); font-weight: 700; font-size: 12px; text-transform: uppercase; padding: 9px 14px; }
+.player__play { width: 112px; height: 112px; border-radius: 50%; background: var(--red); display: grid; place-items: center; transition: transform .2s; }
+.player:hover .player__play { transform: scale(1.06) rotate(-4deg); }
+.player__cap { position: absolute; left: 20px; bottom: 18px; right: 20px; }
+.player__cap strong { display: block; font-family: var(--display); font-size: 20px; }
+.player__cap small { color: var(--soft); }
+.playlist h3 { font-family: var(--display); font-weight: 700; font-size: 20px; margin: 0 0 14px; }
+.playlist ul { list-style: none; margin: 0 0 22px; padding: 0; }
+.playlist li a { display: flex; gap: 16px; align-items: center; padding: 14px 0; border-bottom: 1px solid rgba(238,230,213,.2); text-decoration: none; }
+.thumb { width: 108px; aspect-ratio: 16 / 10; flex: none; display: grid; place-items: center; font-family: var(--display); font-weight: 900; font-size: 13px; text-transform: uppercase; padding: 8px; text-align: center; line-height: 1.1; }
+.playlist small { display: block; color: var(--soft); font-size: 13px; }
+.playlist strong { font-size: 16px; line-height: 1.3; }
+
+/* ── розклад ── */
+.week-grid { display: flex; flex-wrap: wrap; gap: 56px; align-items: flex-start; }
+.week { flex: 999 1 560px; min-width: 0; border-top: 2px solid var(--ink); list-style: none; margin: 0; padding: 0; }
+.week li { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 22px; padding: 22px 0; border-bottom: 2px solid var(--ink); }
+.week__short { font-family: var(--display); font-weight: 900; font-size: 64px; line-height: 1; letter-spacing: -.04em; color: var(--red); width: 120px; }
+.week__day { font-family: var(--hand); font-weight: 700; font-size: 34px; line-height: 1; transform: rotate(-6deg); width: 110px; }
+.week__body { flex: 1 1 200px; min-width: 0; }
+.week__body strong { display: block; font-family: var(--display); font-weight: 700; font-size: 22px; line-height: 1.2; }
+.week__body span { font-size: 15px; color: var(--muted); }
+.time-pill { font-family: var(--display); font-weight: 700; font-size: 17px; background: var(--ink); color: var(--paper); padding: 10px 16px; border-radius: 999px; white-space: nowrap; }
+.poster { flex: 1 1 300px; min-width: 0; max-width: 440px; margin: 20px auto 0; position: relative; }
+.poster img { transform: rotate(3deg); box-shadow: 0 30px 50px -20px rgba(30,39,35,.45); }
+.tape { position: absolute; top: -14px; left: 50%; margin-left: -60px; width: 120px; height: 34px; background: rgba(169,198,232,.8); transform: rotate(-3deg); z-index: 2; }
+.poster .hand { margin-top: 26px; font-size: 30px; line-height: 1.1; transform: rotate(-2deg); }
+
+/* ── події ── */
+.events { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 44px 34px; }
+.event { display: flex; flex-direction: column; gap: 14px; }
+.event__img { position: relative; }
+.event__img img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; }
+.event:nth-child(1) img { transform: rotate(-1.5deg); } .event:nth-child(2) img { transform: rotate(1.5deg); } .event:nth-child(3) img { transform: rotate(-1deg); }
+.sticker { position: absolute; z-index: 2; top: -16px; left: 18px; font-family: var(--display); font-weight: 700; font-size: 14px; padding: 8px 14px; transform: rotate(-4deg); }
+.event h3 { margin: 8px 0 0; font-family: var(--display); font-weight: 700; font-size: 24px; line-height: 1.15; }
+.event p { margin: 0; font-size: 16px; }
+
+/* ── вперше ── */
+.first { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 60px; align-items: start; }
+.steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 26px; margin-top: 46px; }
+.step { padding: 32px 26px 28px; color: var(--ink); box-shadow: 0 22px 34px -18px rgba(0,0,0,.5); }
+.step:nth-child(1) { background: var(--paper); transform: rotate(-2deg); }
+.step:nth-child(2) { background: var(--orange); transform: rotate(1.5deg); }
+.step:nth-child(3) { background: var(--sky); transform: rotate(-1deg); }
+.step__n { font-family: var(--display); font-weight: 900; font-size: 54px; line-height: 1; color: var(--red); }
+.step:nth-child(2) .step__n { color: var(--blue); }
+.step strong { display: block; font-family: var(--display); font-weight: 700; font-size: 20px; margin-top: 14px; }
+.step p { margin: 8px 0 0; font-size: 16px; }
+.faq { background: var(--paper); color: var(--ink); padding: 34px 30px; transform: rotate(1deg); }
+.faq h3 { font-family: var(--display); font-weight: 900; text-transform: uppercase; font-size: 24px; margin: 0 0 10px; }
+.faq details { border-bottom: 2px solid var(--ink); }
+.faq summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; gap: 16px; padding: 18px 0; font-weight: 800; font-size: 17px; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: '+'; font-family: var(--display); font-weight: 900; font-size: 24px; line-height: 1; color: var(--red); }
+.faq details[open] summary::after { content: '–'; }
+.faq details p { margin: 0 0 18px; color: var(--muted); }
+
+/* ── служіння ── */
+.ministries { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+.min { text-decoration: none; display: flex; flex-direction: column; gap: 14px; min-height: 300px; padding: 30px 28px; transition: transform .2s; }
+.min:hover { transform: rotate(0) translateY(-4px) !important; }
+.min__n { font-family: var(--display); font-weight: 900; font-size: 18px; opacity: .6; }
+.min__t { font-family: var(--display); font-weight: 900; font-size: 30px; line-height: 1.05; text-transform: uppercase; letter-spacing: -.02em; }
+.min__x { font-size: 16px; line-height: 1.5; flex: 1; }
+.min__go { font-family: var(--hand); font-weight: 700; font-size: 28px; line-height: 1; }
+.min--1 { background: var(--red); color: #FFF8EC; transform: rotate(-1deg); }
+.min--2 { background: var(--cobalt); color: var(--paper); transform: rotate(.8deg); }
+.min--3 { background: var(--orange); color: var(--ink); transform: rotate(-.6deg); }
+.min--4 { background: var(--ink); color: var(--paper); transform: rotate(1deg); }
+.min--5 { background: var(--paper2); color: var(--ink); border: 2px solid var(--ink); transform: rotate(-.8deg); }
+.min--6 { background: var(--sky); color: var(--ink); transform: rotate(.6deg); }
+
+/* ── діти ── */
+.kids { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 60px; align-items: center; }
+.kids__points { list-style: none; padding: 0; margin: 30px 0 34px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.kids__points li { background: var(--paper); border: 2px solid var(--ink); padding: 14px 16px; font-weight: 800; display: flex; gap: 10px; align-items: center; }
+.kids__points li::before { content: ''; width: 12px; height: 12px; background: var(--red); flex: none; transform: rotate(45deg); }
+.kids__art { position: relative; min-height: 460px; }
+.kids__card { position: absolute; padding: 30px; box-shadow: 0 26px 40px -18px rgba(30,39,35,.45); }
+.kids__card--a { left: 0; top: 0; width: 66%; height: 300px; background: var(--sky); transform: rotate(-4deg); display: flex; align-items: flex-end; }
+.kids__card--b { right: 0; bottom: 0; width: 60%; background: var(--orange); transform: rotate(5deg); }
+.kids__card--a span { font-family: var(--display); font-weight: 900; font-size: 22px; color: var(--ink); text-transform: uppercase; opacity: .55; }
+.kids__verse { font-family: var(--hand); font-weight: 700; font-size: 34px; line-height: 1.1; color: var(--ink); margin: 0; }
+.kids__verse cite { display: block; margin-top: 10px; font-family: var(--display); font-style: normal; font-size: 13px; text-transform: uppercase; letter-spacing: .08em; }
+.kids__time { position: absolute; left: 12%; bottom: 40px; background: var(--ink); color: var(--paper); padding: 16px 20px; transform: rotate(-3deg); }
+.kids__time strong { display: block; font-family: var(--display); font-weight: 900; font-size: 26px; line-height: 1.1; }
+.kids__time .hand { font-size: 26px; }
+
+/* ── свята ── */
+.next-feast { margin: 0; background: var(--red); color: #FFF8EC; padding: 20px 24px; transform: rotate(-2deg); max-width: 380px; }
+.next-feast small { font-family: var(--hand); font-weight: 700; font-size: 26px; display: block; line-height: 1; }
+.next-feast strong { display: block; font-family: var(--display); font-weight: 900; font-size: 24px; line-height: 1.15; margin: 6px 0; text-transform: uppercase; }
+.feasts { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 16px; }
+.feast { border: 2px solid var(--ink); padding: 18px 20px; display: flex; gap: 16px; align-items: center; background: var(--paper); position: relative; }
+.feast__date { font-family: var(--display); font-weight: 900; font-size: 34px; line-height: .9; color: var(--red); min-width: 52px; text-align: center; }
+.feast__date small { display: block; font-family: var(--hand); font-size: 20px; color: var(--ink); font-weight: 700; margin-top: 4px; }
+.feast__name { font-weight: 800; font-size: 16px; line-height: 1.3; }
+.feast.is-past { opacity: .45; }
+.feast.is-next { background: var(--cobalt); color: var(--paper); border-color: var(--cobalt); transform: rotate(-1.5deg); }
+.feast.is-next .feast__date, .feast.is-next .feast__date small { color: var(--paper); }
+.feast__badge { position: absolute; top: -14px; right: 12px; background: var(--orange); color: var(--ink); font-family: var(--display); font-weight: 700; font-size: 11px; text-transform: uppercase; padding: 5px 10px; transform: rotate(3deg); }
+
+/* ── молитва ── */
+.prayer { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 60px; align-items: start; }
+.ways { list-style: none; padding: 0; margin: 30px 0 0; display: grid; gap: 10px; }
+.ways li { border-bottom: 1px solid rgba(238,230,213,.3); padding: 12px 0; display: flex; flex-direction: column; }
+.ways strong { font-family: var(--display); font-size: 14px; text-transform: uppercase; letter-spacing: .06em; }
+.ways span, .ways a { color: var(--soft); }
+.form { background: var(--paper); color: var(--ink); padding: 34px 30px; transform: rotate(1.2deg); box-shadow: 0 30px 50px -20px rgba(0,0,0,.5); display: flex; flex-direction: column; gap: 16px; }
+.field { display: flex; flex-direction: column; gap: 8px; font-weight: 800; font-size: 15px; }
+.field input, .field textarea { border: 2px solid var(--ink); background: #F7F2E8; padding: 14px 16px; font-weight: 500; font-size: 16px; border-radius: 0; outline: none; }
+.field input:focus, .field textarea:focus { border-color: var(--cobalt); }
+.check { display: flex; gap: 10px; align-items: center; font-weight: 700; font-size: 15px; }
+.check input { width: 20px; height: 20px; accent-color: var(--red); }
+.form .btn { align-self: flex-start; border: 0; }
+.done { text-align: left; }
+.done strong { display: block; font-family: var(--display); font-weight: 900; font-size: 28px; text-transform: uppercase; color: var(--red); }
+
+/* ── соцмережі ── */
+.socials { list-style: none; margin: 0 0 40px; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
+.social { display: flex; flex-direction: column; gap: 8px; text-decoration: none; padding: 26px; border: 2px solid var(--ink); background: var(--paper); height: 100%; transition: transform .2s; }
+.social:hover { transform: rotate(-1deg) translateY(-3px); }
+.social__ic { width: 52px; height: 52px; display: grid; place-items: center; font-family: var(--display); font-weight: 900; color: #FFF8EC; margin-bottom: 8px; transform: rotate(-5deg); }
+.social strong { font-family: var(--display); font-size: 22px; }
+.social__go { font-family: var(--hand); font-weight: 700; font-size: 26px; margin-top: auto; }
+.insta { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; }
+.insta a { display: block; aspect-ratio: 1; overflow: hidden; }
+.insta img { width: 100%; height: 100%; object-fit: cover; transition: transform .3s; }
+.insta a:hover img { transform: scale(1.06); }
+.insta__tile { width: 100%; height: 100%; display: grid; place-items: center; font-family: var(--display); font-weight: 900; text-transform: uppercase; text-align: center; font-size: 15px; padding: 10px; line-height: 1.1; }
+
+/* ── підвал ── */
+.footer { background: var(--ink); color: var(--paper); padding: 100px 0 36px; }
+.footer__big { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 6px 26px; }
+.footer__big .h2 { font-size: clamp(46px, 8.6vw, 150px); line-height: .88; color: var(--red); }
+.footer__big .hand { font-size: 46px; transform: rotate(-6deg); margin-bottom: 18px; }
+.footer__grid { display: grid; grid-template-columns: 1.4fr repeat(3, 1fr); gap: 34px; margin-top: 70px; padding-top: 34px; border-top: 2px solid rgba(238,230,213,.25); }
+.footer h4 { margin: 0 0 12px; font-family: var(--display); font-weight: 700; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--soft); }
+.footer ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; font-weight: 700; }
+.footer ul a { text-decoration: none; } .footer ul a:hover { color: var(--orange); }
+.subscribe { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+.subscribe input { flex: 1 1 200px; min-width: 0; border: 2px solid var(--paper); background: transparent; color: var(--paper); padding: 14px 16px; border-radius: 999px; outline: none; }
+.subscribe input::placeholder { color: var(--soft); }
+.footer__bottom { margin-top: 60px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; font-size: 14px; color: var(--soft); }
+.footer__bottom a { color: var(--paper); }
+
+/* ── поява при прокрутці ── */
+.reveal { opacity: 0; translate: 0 26px; transition: opacity .7s ease, translate .7s ease; }
+.reveal.is-in { opacity: 1; translate: 0 0; }
+@media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; translate: none; } .marquee__track { animation: none; } html { scroll-behavior: auto; } }
+
+/* ═════════ адаптив ═════════ */
+@media (max-width: 1100px) {
+  .nav { display: none; }
+  .burger { display: inline-flex; }
+  .stream, .first, .kids, .prayer { grid-template-columns: 1fr; }
+  .infobar { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .infobar li:nth-child(2) { border-right: 0; }
+  .infobar li:nth-child(-n+2) { border-bottom: 2px solid var(--ink); }
+  .footer__grid { grid-template-columns: 1fr 1fr; }
+  .insta { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 760px) {
+  :root { --pad: 20px; }
+  body { font-size: 16px; }
+  .section { padding: 76px 0; }
+  .head { margin-bottom: 36px; }
+  .header__in { padding-top: 12px; padding-bottom: 12px; }
+  .header .cta { display: none; }
+  .lede { font-size: 18px; }
+  .btn { padding: 16px 22px; font-size: 13px; }
+  .hero { padding-top: 20px; padding-bottom: 50px; gap: 36px; }
+  .collage { height: 520px; }
+  .note { width: 72%; padding: 38px 20px 22px; }
+  .note__title { font-size: 25px; }
+  .ticket { display: flex; transform: rotate(-1deg); }
+  .ticket > div { padding: 14px 16px; }
+  .ticket__when { font-size: 24px; }
+  .marquee { margin-top: 50px; padding: 14px 0; }
+  .infobar li { padding: 16px; }
+  .infobar strong { font-size: 15px; }
+  .countdown__boxes div { min-width: 0; flex: 1; }
+  .countdown__boxes strong { font-size: 26px; }
+  .week__short { font-size: 42px; width: 74px; }
+  .week__day { font-size: 28px; width: auto; }
+  .week__body strong { font-size: 19px; }
+  .time-pill { font-size: 14px; padding: 8px 12px; }
+  .min { min-height: 0; }
+  .min__t { font-size: 26px; }
+  .kids__points { grid-template-columns: 1fr; }
+  .kids__art { min-height: 400px; }
+  .faq, .form { padding: 26px 20px; }
+  .footer__grid { grid-template-columns: 1fr; }
+  .insta { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .live-pill span { display: none; }
+}
+
+/* ── правки після перевірки ── */
+.ministries { grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); }
+.min__t { overflow-wrap: anywhere; hyphens: auto; }
+#molytva .h2 { font-size: clamp(36px, 4.6vw, 72px); }
+.steps { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+.footer .muted { color: var(--soft); }
+@media (max-width: 760px) { .ministries { grid-template-columns: 1fr; } }
+@media (max-width: 760px) {
+  .player { aspect-ratio: 4 / 3; }
+  .player__play { width: 84px; height: 84px; }
+  .player__cap strong { font-size: 17px; }
+  .kids__art { min-height: 0; display: grid; gap: 18px; }
+  .kids__card, .kids__time { position: static; width: auto !important; height: auto !important; }
+  .kids__card--a { min-height: 180px; }
+  .kids__time { justify-self: start; }
+  #molytva .h2 { font-size: 32px; }
+}
