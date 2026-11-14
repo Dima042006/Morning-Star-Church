@@ -328,3 +328,14 @@ button, input, textarea { font: inherit; color: inherit; }
   .kids__time { justify-self: start; }
   #molytva .h2 { font-size: 32px; }
 }
+/* заголовок у половині сторінки: розмір від ширини колонки, а не екрана */
+.prayer > div:first-child { container-type: inline-size; min-width: 0; }
+#molytva .h2 { font-size: min(72px, 10.6cqi); overflow-wrap: anywhere; }
+@media (max-width: 760px) { #molytva .h2 { font-size: min(40px, 10.6cqi); } }
+/* бейджі записів: текст завжди всередині */
+.thumb { width: 120px; font-size: 11px; letter-spacing: .02em; overflow: hidden; overflow-wrap: anywhere; }
+@media (max-width: 760px) { .thumb { width: 104px; font-size: 10px; } }
+/* таймер не виходить за край */
+.countdown { max-width: 100%; }
+.countdown__boxes div { min-width: 0; width: 80px; }
+@media (max-width: 760px) { .countdown__boxes div { width: auto; } }
