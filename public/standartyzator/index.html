@@ -160,6 +160,7 @@ button.main:disabled { opacity:.3; cursor:not-allowed; }
 .inline .btn { width:auto; margin-top:0; padding:0 18px; }
 
 [hidden] { display:none !important; }
+.opts.light .dark-only { display:none; }
 
 /* ---------- планшет / телефон ---------- */
 @media (max-width: 1100px) {
@@ -273,13 +274,14 @@ button.main:disabled { opacity:.3; cursor:not-allowed; }
   <details id="optsBox">
     <summary>02 / Налаштування</summary>
     <div class="opts">
-      <div class="row"><span>Затемнення фото</span>
+      <div class="row"><span>Тема слайдів</span><select id="theme"><option value="light">Світла — білий фон, чорний текст</option><option value="dark">Темна — фото природи</option></select></div>
+      <div class="row dark-only"><span>Затемнення фото</span>
         <input id="overlay" type="range" min="0" max="100" step="5"><b id="overlayVal"></b></div>
       <div class="row"><span>Шрифт</span><select id="family"></select></div>
       <div class="row"><span>Товщина тексту</span><select id="weight"></select></div>
       <div class="row"><span>Товщина приспіву</span><select id="chorusWeight"></select></div>
-      <div class="row"><span>Фото природи на фоні</span><input id="photos" type="checkbox"></div>
-      <div class="row"><span>Фото неба, якщо згадується небо</span><input id="sky" type="checkbox"></div>
+      <div class="row dark-only"><span>Фото природи на фоні</span><input id="photos" type="checkbox"></div>
+      <div class="row dark-only"><span>Фото неба, якщо згадується небо</span><input id="sky" type="checkbox"></div>
       <div class="row"><span>Перший слайд — назва</span><input id="titleSlide" type="checkbox"></div>
     </div>
   </details>
@@ -345,7 +347,7 @@ function fontInfo(weight) {
   return { file: f[0], face: f[1], bold: f[2], synthetic: !!f[3], weight: best, linePct: LINE_HEIGHT / fam.base };
 }
 var WEIGHT_NAMES = {100:'Thin',200:'ExtraLight',300:'Light',400:'Regular',500:'Medium',600:'SemiBold',700:'Bold',800:'ExtraBold',900:'Black'};
-var DEFAULTS = { family: 'Mariupol', overlay: 90, weight: 400, chorusWeight: 700, photos: true, sky: true, titleSlide: false };
+var DEFAULTS = { theme: 'light', family: 'Mariupol', overlay: 90, weight: 400, chorusWeight: 700, photos: true, sky: true, titleSlide: false };
 
 var L = '\\p{L}*';
 var KEYWORDS = {
@@ -661,7 +663,7 @@ async function preparedPhoto(p) {      // обрізка під 21:9, JPEG; зб
 /** Фонове завантаження шрифтів і фото, поки людина вставляє текст. */
 async function prefetch() {
   try { await Promise.all([loadFont(settings.weight), loadFont(settings.chorusWeight)]); } catch (e) {}
-  if (!settings.photos) return;
+  if (!settings.photos || settings.theme === 'light') return;
   var all = [];
   ['гори', 'вода', 'земля', 'небо', 'природа'].forEach(function (c) { all = all.concat(setup.photos[c] || []); });
   for (var i = 0; i < all.length; i += 2) {
@@ -700,7 +702,7 @@ async function buildSlides(slides, title, progress) {
     s.weight = w;
     s.wrapped = s.lines.map(function (l) { return wrapLine(l, size, w, a.w); });
     s.photo = null;
-    picks.push(settings.photos && s.lines.length ? picker.pick(chooseCategory(s.lines.join(' '), settings.sky)) : null);
+    picks.push(settings.photos && settings.theme !== 'light' && s.lines.length ? picker.pick(chooseCategory(s.lines.join(' '), settings.sky)) : null);
   });
   var total = picks.filter(Boolean).length, done = 0;
   if (total) progress('Завантажую фото 0 з ' + total + '…');
@@ -719,8 +721,9 @@ function drawPreview(canvas, s, size) {
   canvas.width = Math.round(cssW * dpr); canvas.height = Math.round(cssW * H / W * dpr);
   var ctx = canvas.getContext('2d');
   var k = canvas.width / (W * 72);                      // пікселів на пункт
-  ctx.fillStyle = '#000'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-  if (s.photo) {
+  var light = settings.theme === 'light', ink = light ? '#000' : '#fff';
+  ctx.fillStyle = light ? '#fff' : '#000'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+  if (s.photo && !light) {
     ctx.drawImage(s.photo.canvas, 0, 0, canvas.width, canvas.height);
     ctx.fillStyle = 'rgba(0,0,0,' + settings.overlay / 100 + ')';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -729,10 +732,10 @@ function drawPreview(canvas, s, size) {
   s.wrapped.forEach(function (g) { lines = lines.concat(g); });
   var lh = size * LINE_HEIGHT * k;
   var y0 = canvas.height / 2 - lines.length * lh / 2;
-  ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillStyle = ink; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.font = (size * k) + 'px "' + fontFamily(s.weight) + '"';
   var fake = fontInfo(s.weight).synthetic;
-  ctx.strokeStyle = '#fff'; ctx.lineWidth = size * k * 0.035; ctx.lineJoin = 'round';
+  ctx.strokeStyle = ink; ctx.lineWidth = size * k * 0.035; ctx.lineJoin = 'round';
   lines.forEach(function (l, i) {
     var y = y0 + lh * (i + 0.5);
     ctx.fillText(l, canvas.width / 2, y);
@@ -740,7 +743,7 @@ function drawPreview(canvas, s, size) {
   });
   if (s.chorus) {
     ctx.font = (CHORUS_LABEL_SIZE * k) + 'px "' + fontFamily(settings.weight) + '"';
-    ctx.fillStyle = 'rgba(255,255,255,.75)'; ctx.textAlign = 'right'; ctx.textBaseline = 'bottom';
+    ctx.fillStyle = light ? 'rgba(0,0,0,.6)' : 'rgba(255,255,255,.75)'; ctx.textAlign = 'right'; ctx.textBaseline = 'bottom';
     ctx.fillText(CHORUS_LABEL, canvas.width * 0.97, canvas.height * 0.96);
   }
 }
@@ -777,10 +780,11 @@ function makePptx(b) {
   pptx.defineLayout({ name: 'W21x9', width: W, height: H });
   pptx.layout = 'W21x9';
   pptx.title = b.title;
+  var light = settings.theme === 'light', ink = light ? '000000' : 'FFFFFF';
   b.slides.forEach(function (s) {
     var slide = pptx.addSlide();
-    slide.background = { color: '000000' };
-    if (s.photo) {
+    slide.background = { color: light ? 'FFFFFF' : '000000' };
+    if (s.photo && !light) {
       slide.addImage({ data: s.photo.url, x: 0, y: 0, w: W, h: H });
       if (settings.overlay > 0) {
         slide.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: W, h: H,
@@ -792,19 +796,19 @@ function makePptx(b) {
     s.wrapped.forEach(function (group) {
       group.forEach(function (line) { runs.push({ text: line, options: { breakLine: true } }); });
     });
-    if (!runs.length) return;                       // порожній слайд — лише чорний фон
+    if (!runs.length) return;                       // порожній слайд — лише фон
     delete runs[runs.length - 1].options.breakLine;
     slide.addText(runs, {
       x: W * H_PAD, y: H * V_PAD, w: W * (1 - 2 * H_PAD), h: H * (1 - 2 * V_PAD),
       margin: 0, align: 'center', valign: 'middle', fontFace: f.face, bold: f.bold,
-      fontSize: b.size, color: 'FFFFFF', lineSpacingMultiple: Math.round(f.linePct * 100) / 100,
+      fontSize: b.size, color: ink, lineSpacingMultiple: Math.round(f.linePct * 100) / 100,
       paraSpaceBefore: 0, paraSpaceAfter: 0, fit: 'none', wrap: true
     });
     if (s.chorus) {
       var lf = fontInfo(settings.weight);
       slide.addText(CHORUS_LABEL, { x: W - 3 - W * 0.03, y: H - 0.6 - H * 0.04, w: 3, h: 0.6, margin: 0,
         align: 'right', valign: 'bottom', fontFace: lf.face, bold: lf.bold, fontSize: CHORUS_LABEL_SIZE,
-        color: 'FFFFFF', transparency: 25 });
+        color: ink, transparency: light ? 40 : 25 });
     }
   });
   return pptx;
@@ -1230,6 +1234,7 @@ function fillWeights() {
   $('weight').value = settings.weight; $('chorusWeight').value = settings.chorusWeight;
 }
 function applySettingsToUI() {
+  $('theme').value = settings.theme; $('optsBox').querySelector('.opts').classList.toggle('light', settings.theme === 'light');
   $('overlay').value = settings.overlay; $('overlayVal').textContent = settings.overlay + '%';
   $('family').value = settings.family; fillWeights();
   $('photos').checked = settings.photos; $('sky').checked = settings.sky; $('titleSlide').checked = settings.titleSlide;
@@ -1242,6 +1247,9 @@ function readSettingsFromUI(e) {
     settings.weight = d[0]; settings.chorusWeight = d[1];
     fillWeights();
   }
+  var themeChanged = settings.theme !== $('theme').value;
+  settings.theme = $('theme').value; $('optsBox').querySelector('.opts').classList.toggle('light', settings.theme === 'light');
+  if (themeChanged && settings.theme === 'dark') prefetch();
   settings.overlay = +$('overlay').value; $('overlayVal').textContent = settings.overlay + '%';
   settings.weight = +$('weight').value; settings.chorusWeight = +$('chorusWeight').value;
   settings.photos = $('photos').checked; settings.sky = $('sky').checked; settings.titleSlide = $('titleSlide').checked;
@@ -1320,7 +1328,7 @@ function setupKeyAndInstall() {
     status('Без інтернету: перегляд працює, зберегти можна буде пізніше');
   }
   prefetch();
-  ['family', 'overlay', 'weight', 'chorusWeight', 'photos', 'sky', 'titleSlide'].forEach(function (id) {
+  ['theme', 'family', 'overlay', 'weight', 'chorusWeight', 'photos', 'sky', 'titleSlide'].forEach(function (id) {
     $(id).addEventListener('input', readSettingsFromUI);
     $(id).addEventListener('change', readSettingsFromUI);
   });
