@@ -27,9 +27,11 @@ export function makeSearch(bible) {
     if (q.length < 2) return [];
     const score = new Map();
     for (const k of q) for (const id of index.get(k) || []) score.set(id, (score.get(id) || 0) + 1);
-    return [...score.entries()]
-      .map(([id, n]) => ({ id, n }))
-      .filter((x) => x.n / q.length >= 0.5)
+    const all = [...score.entries()].map(([id, n]) => ({ id, n }));
+    let hits = all.filter((x) => x.n / q.length >= 0.5);
+    // переказ своїми словами: збігається лише частина слів — показуємо найближчі
+    if (!hits.length) hits = all.filter((x) => x.n >= 3 && x.n / q.length >= 0.3);
+    return hits
       .sort((a, b) => b.n - a.n || a.id - b.id)
       .slice(0, limit)
       .map(({ id, n }) => {
