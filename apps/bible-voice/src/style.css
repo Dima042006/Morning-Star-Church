@@ -86,3 +86,14 @@ footer{color:var(--faint)}
 input[type=checkbox],input[type=radio]{accent-color:var(--red)}
 .ai-state{color:var(--faint)}
 .panel h2,.verse-reference,.count,.db-number,.brand strong,.output-ref{font-family:Oswald,Impact,sans-serif}
+
+/* ===== Вікно LIVE = слайд Стандартизатора: 21:9, білий фон, чорний текст Mariupol ===== */
+.screen{background:#000;color:#000}
+.stage{position:relative;width:min(100vw,calc(100vh * 21 / 9));aspect-ratio:21/9;background:#fff;overflow:hidden}
+.stage .screen-inner{position:absolute;inset:5% 3%;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.stage .screen-text{color:#000;line-height:1.25;font-weight:400}
+.stage .screen-ref{position:absolute;right:3%;bottom:4%;left:auto;color:rgba(0,0,0,.6);line-height:1;letter-spacing:0}
+.screen-hint{color:rgba(0,0,0,.5);border-color:rgba(0,0,0,.2);z-index:2}
+/* попередній перегляд у панелі оператора — так само, як на проєкторі */
+.verse-card{background:#fff;color:#111;border:1px solid var(--line2)}
+.verse-card-head,.verse-card-bottom{color:#8a8279}

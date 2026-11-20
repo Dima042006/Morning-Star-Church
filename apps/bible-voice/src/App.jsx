@@ -91,7 +91,7 @@ async function openOnProjector() {
 /* ======================= ВІКНО LIVE (для проєктора / OBS) ======================= */
 export function Output() {
   const [live, setLive] = useState(() => getStore(LIVE_KEY, null));
-  const textRef = useRef(null), boxRef = useRef(null);
+  const textRef = useRef(null), boxRef = useRef(null), stageRef = useRef(null), refRef = useRef(null);
 
   useEffect(() => {
     const bc = new BroadcastChannel(LIVE_KEY);
@@ -101,15 +101,18 @@ export function Output() {
     return () => { bc.close(); window.removeEventListener('storage', onStorage); };
   }, []);
 
-  // підбираємо найбільший розмір шрифту, за якого вірш вміщається
+  // Слайд як у Стандартизаторі: 21:9, відступи 5% / 3%, текст до 56 pt на висоту 5.714″ (13.6% висоти),
+  // підпис праворуч унизу — 20 pt (4.9% висоти). Підбираємо найбільший розмір, за якого вірш вміщається.
   const fit = useCallback(() => {
-    const t = textRef.current, box = boxRef.current;
-    if (!t || !box) return;
-    let lo = 16, hi = 140;
+    const t = textRef.current, box = boxRef.current, stage = stageRef.current;
+    if (!t || !box || !stage) return;
+    const sh = stage.clientHeight;
+    if (refRef.current) refRef.current.style.fontSize = Math.round(sh * 0.0486) + 'px';
+    let lo = 10, hi = Math.max(12, Math.round(sh * 0.136)) + 1;
     while (hi - lo > 1) {
       const mid = (lo + hi) >> 1;
       t.style.fontSize = mid + 'px';
-      if (t.scrollHeight <= box.clientHeight * 0.88 && t.scrollWidth <= box.clientWidth) lo = mid; else hi = mid;
+      if (t.scrollHeight <= box.clientHeight * 0.9 && t.scrollWidth <= box.clientWidth) lo = mid; else hi = mid;
     }
     t.style.fontSize = lo + 'px';
   }, []);
@@ -137,12 +140,16 @@ export function Output() {
   return (
     <div className="screen" onDoubleClick={toggleFs}>
       {!full ? <div className="screen-hint">Двічі клацніть (або F) — на весь екран</div> : null}
-      {live ? (
-        <div className="screen-inner" ref={boxRef}>
-          <div className="screen-text" ref={textRef}>{live.text}</div>
-          <div className="screen-ref">{live.label}</div>
-        </div>
-      ) : null}
+      <div className="stage" ref={stageRef}>
+        {live ? (
+          <>
+            <div className="screen-inner" ref={boxRef}>
+              <div className="screen-text" ref={textRef}>{live.text}</div>
+            </div>
+            <div className="screen-ref" ref={refRef}>{live.label}</div>
+          </>
+        ) : null}
+      </div>
     </div>
   );
 }
