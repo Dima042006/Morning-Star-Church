@@ -28,7 +28,7 @@ export function readKeyFromHash() {
 }
 
 /** → [{ book, chapter, verse, verseEnd, confidence, ai: true }] — лише ті, що існують у Біблії */
-export async function askAI(text, bible, timeoutMs = 8000) {
+export async function askAI(text, bible, timeoutMs = 8000, fn = 'bibleAI') {
   const { key, url } = aiConfig();
   if (!key) throw new Error('немає ключа доступу');
   const ctrl = new AbortController();
@@ -36,7 +36,7 @@ export async function askAI(text, bible, timeoutMs = 8000) {
   try {
     const res = await fetch(url, {
       method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ key, fn: 'bibleAI', args: [text, NAMES] }), signal: ctrl.signal,
+      body: JSON.stringify({ key, fn, args: [text, NAMES] }), signal: ctrl.signal,
     });
     const data = await res.json();
     if (!data.ok) throw new Error(data.error);
@@ -52,3 +52,6 @@ export async function askAI(text, bible, timeoutMs = 8000) {
     throw new Error(e.name === 'AbortError' ? 'ШІ не відповів вчасно' : e.message);
   } finally { clearTimeout(timer); }
 }
+
+/** Уривок / переказ / цитата з іншого перекладу → місця в Біблії (до 3). */
+export const askAIQuote = (text, bible) => askAI(text, bible, 12000, 'bibleQuote');

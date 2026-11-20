@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import StarMark from './StarMark.jsx';
 import { loadBible } from './lib/bible.js';
 import { findReferences, normalize, mentionsBook } from './lib/parser.js';
-import { askAI, aiConfig, setAiKey, setAiEnabled, readKeyFromHash } from './lib/ai.js';
+import { askAI, askAIQuote, aiConfig, setAiKey, setAiEnabled, readKeyFromHash } from './lib/ai.js';
 import { makeSearch } from './lib/search.js';
 import { BOOKS } from './lib/books.js';
 
@@ -168,6 +168,7 @@ export default function App() {
   const channel = useRef(null);
   const [ai, setAi] = useState(() => { readKeyFromHash(); return aiConfig(); });
   const [aiState, setAiState] = useState('');          // '', 'думає', текст помилки
+  const quoteSeq = useRef(0);
   const aiBusy = useRef(false), aiPending = useRef(false), aiRef = useRef(ai);
   aiRef.current = ai;
   const previewRef = useRef(null);
@@ -235,6 +236,20 @@ export default function App() {
     setResults(list);
     setPreview(list[0] || null);
     setStatus(list.length ? `Знайдено: ${list.length}` : 'Нічого не знайдено. Спробуйте «Івана 3 16» або кілька слів з вірша.');
+    // уривок без посилання: ШІ впізнає вірш навіть за переказом чи іншим перекладом
+    if (!refs.length && ai.enabled && ai.key && q.split(/\s+/).length >= 3) {
+      const seq = ++quoteSeq.current;
+      setStatus((list.length ? `Знайдено: ${list.length} · ` : '') + 'ШІ шукає за змістом…');
+      askAIQuote(q, bible).then((found) => {
+        if (seq !== quoteSeq.current) return;
+        const aiList = found.map((r) => ({ ...toVerse(bible, r), ai: true }));
+        if (!aiList.length) { setStatus(list.length ? `Знайдено: ${list.length} · ШІ нічого не додав` : 'Ні пошук, ні ШІ не знайшли цей уривок'); return; }
+        const seen = new Set(aiList.map((v) => v.label));
+        const merged = aiList.concat(list.filter((v) => !seen.has(v.label)));
+        setResults(merged); setPreview(merged[0]);
+        setStatus(`ШІ впізнав: ${aiList.map((v) => v.label).join(', ')}`);
+      }).catch((e) => setStatus((list.length ? `Знайдено: ${list.length} · ` : '') + 'ШІ: ' + e.message));
+    }
   };
 
   const stop = () => {
@@ -390,7 +405,7 @@ export default function App() {
                 </div>
                 <div className="divider-label">АБО ВВЕДІТЬ ВРУЧНУ</div>
                 <form onSubmit={(e) => { e.preventDefault(); runSearch(query); }} className="search-form">
-                  <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="ів 3 16 · 1 кор 13 4 · пс 23 · або слова з вірша" />
+                  <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="ів 3 16 · пс 23 · або уривок своїми словами" />
                   <button type="submit" disabled={!bible}>Знайти ↗</button>
                 </form>
                 <div className="status">↗ {status}{ai.enabled && ai.key ? <span className="ai-state"> · ШІ {aiState === 'думає' ? 'думає…' : aiState ? '— ' + aiState : 'на підхваті'}</span> : null}</div>
