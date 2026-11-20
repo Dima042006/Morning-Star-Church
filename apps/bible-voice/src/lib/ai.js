@@ -3,11 +3,11 @@
 import { BOOKS, BOOK_INDEX } from './books.js';
 
 // той самий бекенд, що й у Стандартизатора (ключ доступу спільний — той самий сайт)
-const DEFAULT_API_URL = 'https://script.google.com/macros/s/AKfycbwSHWqI8GI1TpnOnatTs8vJvvVKcv_kku8r8e3-hyEUnw7gdntsBMWv-CJEFbt5RwVGiA/exec';
+const DEFAULT_API_URL = 'https://script.google.com/macros/s/AKfycbw-R8LOj_h-22k8B4AmJZ0Z_qQNv7lgjXQ4teloyKDV7ypxINscYPLWZ2D3zP0p2yDcNg/exec';
 const NAMES = BOOKS.map((b) => b.name);
 
 const ls = (k) => { try { return localStorage.getItem(k) || ''; } catch { return ''; } };
-const OLD_IDS = ['AKfycbwOsAKjSSbjZ9YF4YnFX6AR69mB7E8lbiMEt7mxyiQuIvF821ARVlZ8fxYj19woe08iEg', 'AKfycbxAZgVPCr_lmIobsOeovRbFgTh3oD2hYpC0QsQzM3n4TTXU8v0jz3r5ZP4l_KTtkd8SLQ', 'AKfycbyFSk3-N2cR5Q7oVYsYThEX948QpdpD1xG9FJ91_vNMhf1nN4ptAVxdq_mcp961AHL3dg', 'AKfycbyHPGCsWbZCiMpaxn32OP5cHgY7oBw4P6-HbGHv9PSSAVHF2x2TStb0_r9RlJJ2XOYz'];
+const OLD_IDS = ['AKfycbwSHWqI8GI1TpnOnatTs8vJvvVKcv_kku8r8e3-hyEUnw7gdntsBMWv-CJEFbt5RwVGiA', 'AKfycbwOsAKjSSbjZ9YF4YnFX6AR69mB7E8lbiMEt7mxyiQuIvF821ARVlZ8fxYj19woe08iEg', 'AKfycbxAZgVPCr_lmIobsOeovRbFgTh3oD2hYpC0QsQzM3n4TTXU8v0jz3r5ZP4l_KTtkd8SLQ', 'AKfycbyFSk3-N2cR5Q7oVYsYThEX948QpdpD1xG9FJ91_vNMhf1nN4ptAVxdq_mcp961AHL3dg', 'AKfycbyHPGCsWbZCiMpaxn32OP5cHgY7oBw4P6-HbGHv9PSSAVHF2x2TStb0_r9RlJJ2XOYz'];
 const apiUrl = () => { const u = ls('apiUrl'); return u && !OLD_IDS.some((id) => u.includes(id)) ? u : DEFAULT_API_URL; };
 export const aiConfig = () => ({ key: ls('apiKey'), url: apiUrl(), enabled: ls('bv-ai') !== 'off' });
 export const setAiKey = (k) => { try { localStorage.setItem('apiKey', k.trim()); } catch {} };
