@@ -116,8 +116,17 @@ export function Output() {
     }
     t.style.fontSize = lo + 'px';
   }, []);
-  useEffect(() => { fit(); }, [live, fit]);
-  useEffect(() => { window.addEventListener('resize', fit); return () => window.removeEventListener('resize', fit); }, [fit]);
+  useEffect(() => { fit(); document.fonts?.ready.then(fit); }, [live, fit]);
+  useEffect(() => {
+    // перераховуємо, коли змінився розмір вікна і коли довантажився шрифт Mariupol (він ширший за запасний)
+    window.addEventListener('resize', fit);
+    const fonts = document.fonts;
+    fonts?.ready.then(fit);
+    fonts?.addEventListener?.('loadingdone', fit);
+    const ro = 'ResizeObserver' in window ? new ResizeObserver(() => fit()) : null;
+    if (ro && stageRef.current) ro.observe(stageRef.current);
+    return () => { window.removeEventListener('resize', fit); fonts?.removeEventListener?.('loadingdone', fit); ro?.disconnect(); };
+  }, [fit]);
 
   // підказка, поки вікно не на весь екран; F / подвійний клік — повний екран
   const [full, setFull] = useState(!!document.fullscreenElement);
@@ -140,7 +149,7 @@ export function Output() {
   return (
     <div className="screen" onDoubleClick={toggleFs}>
       {!full ? <div className="screen-hint">Двічі клацніть (або F) — на весь екран</div> : null}
-      <div className="stage" ref={stageRef}>
+      <div className={live ? "stage" : "stage stage--empty"} ref={stageRef}>
         {live ? (
           <>
             <div className="screen-inner" ref={boxRef}>
